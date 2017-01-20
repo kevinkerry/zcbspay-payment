@@ -284,5 +284,8 @@
     <module>payment-trade-acc-api</module>
     <module>payment-trade-acc</module>
     <module>payment-trade-acc-simple</module>
+    <module>payment-trade-route-api</module>
+    <module>payment-trade-route</module>
+    <module>payment-trade-route-simple</module>
   </modules>
 </project>
