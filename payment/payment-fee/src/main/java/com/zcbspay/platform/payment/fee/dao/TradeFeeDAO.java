@@ -8,7 +8,7 @@
  * Copyright (c) 2016,zlebank.All rights reserved.
  * 
  */
-package com.zcbspay.platform.support.fee.dao;
+package com.zcbspay.platform.payment.fee.dao;
 
 import com.zcbspay.platform.payment.fee.bean.FeeBean;
 import com.zcbspay.platform.payment.fee.exception.TradeFeeException;

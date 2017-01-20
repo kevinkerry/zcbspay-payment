@@ -8,15 +8,15 @@
  * Copyright (c) 2016,zlebank.All rights reserved.
  * 
  */
-package com.zcbspay.platform.support.fee.service.impl;
+package com.zcbspay.platform.payment.fee.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.zcbspay.platform.payment.fee.bean.FeeBean;
+import com.zcbspay.platform.payment.fee.dao.TradeFeeDAO;
 import com.zcbspay.platform.payment.fee.exception.TradeFeeException;
 import com.zcbspay.platform.payment.fee.service.TradeFeeService;
-import com.zcbspay.platform.support.fee.dao.TradeFeeDAO;
 
 /**
  * Class Description

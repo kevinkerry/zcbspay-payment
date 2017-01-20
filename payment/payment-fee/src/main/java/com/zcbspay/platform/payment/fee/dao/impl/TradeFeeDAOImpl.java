@@ -8,7 +8,7 @@
  * Copyright (c) 2016,zlebank.All rights reserved.
  * 
  */
-package com.zcbspay.platform.support.fee.dao.impl;
+package com.zcbspay.platform.payment.fee.dao.impl;
 
 import java.util.List;
 import java.util.Map;
@@ -20,8 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.zcbspay.platform.payment.commons.dao.impl.HibernateBaseDAOImpl;
 import com.zcbspay.platform.payment.fee.bean.FeeBean;
+import com.zcbspay.platform.payment.fee.dao.TradeFeeDAO;
 import com.zcbspay.platform.payment.fee.exception.TradeFeeException;
-import com.zcbspay.platform.support.fee.dao.TradeFeeDAO;
 
 /**
  * Class Description

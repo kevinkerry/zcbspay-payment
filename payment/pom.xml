@@ -281,5 +281,8 @@
     <module>payment-risk</module>
     <module>payment-risk-api</module>
     <module>payment-risk-simple</module>
+    <module>payment-trade-acc-api</module>
+    <module>payment-trade-acc</module>
+    <module>payment-trade-acc-simple</module>
   </modules>
 </project>
