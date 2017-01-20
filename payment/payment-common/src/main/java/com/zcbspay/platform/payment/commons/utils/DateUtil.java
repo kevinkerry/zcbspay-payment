@@ -688,7 +688,85 @@ public class DateUtil {
 		return currYearLast;
 	}
 
-	
+	/**
+	 * 获取某年年中
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public static Date getMiddDayOfYear(Date date) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		int year = calendar.get(Calendar.YEAR);
+		int month = calendar.get(Calendar.MONTH) + 1;
+		String dateString = "";
+		if (month <= 6) {
+			dateString = year + "-06-30";
+		} else {
+			dateString = year + "-12-31";
+		}
+		return TimeUtil.parseDate(dateString);
+	}
+
+	/**
+	 * 获取某一季度第一天
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public static Date getFirstDayOfSeason(Date date) {
+		String dateString = "";
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.clear();
+		calendar.setTime(date);
+		int year = calendar.get(Calendar.YEAR);
+		int month = calendar.get(Calendar.MONTH) + 1;
+		if (month >= 1 && month <= 3) {
+			dateString = year + "-" + "01" + "-" + "01";
+		}
+		if (month >= 4 && month <= 6) {
+			dateString = year + "-" + "04" + "-" + "01";
+		}
+		if (month >= 7 && month <= 9) {
+			dateString = year + "-" + "07" + "-" + "01";
+		}
+		if (month >= 10 && month <= 12) {
+			dateString = year + "-" + "10" + "-" + "01";
+		}
+
+		return TimeUtil.parseDate(dateString);
+	}
+
+	/**
+	 * 获取某一季度最后一天
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public static Date getLastDayOfSeason(Date date) {
+		String dateString = "";
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.clear();
+		calendar.setTime(date);
+		int year = calendar.get(Calendar.YEAR);
+		int month = calendar.get(Calendar.MONTH) + 1;
+		if (month >= 1 && month <= 3) {
+			dateString = year + "-" + "03" + "-" + "31";
+		}
+		if (month >= 4 && month <= 6) {
+			dateString = year + "-" + "06" + "-" + "30";
+		}
+		if (month >= 7 && month <= 9) {
+			dateString = year + "-" + "09" + "-" + "30";
+		}
+		if (month >= 10 && month <= 12) {
+			dateString = year + "-" + "12" + "-" + "31";
+		}
+
+		return TimeUtil.parseDate(dateString);
+	}
 
 	/**
 	 * 得到当前日期
@@ -763,7 +841,17 @@ public class DateUtil {
 	public static String getSettleDate(int cycle){
         return formatDateTime(SIMPLE_DATE_FROMAT, skipDateTime(new Date(),cycle));
 	}
-
+	/**
+     * 根据日期字符串返回相应的DATE类型
+     * @param yyyymmdd
+     * @return Date
+     * @throws ParseException 
+     */
+    public static Date convertToDate(String strDate, String format) throws ParseException {
+        SimpleDateFormat sf = new SimpleDateFormat(format);
+        return sf.parse(strDate);
+    }
+    
 	public static void main(String[] args) {
 	    
 		System.out.println(getSettleDate(2));

@@ -171,6 +171,13 @@ public class QuickPayServiceImpl implements QuickPayService{
 					throw new PaymentQuickPayException("PC019");
 				}
 				resultBean = BeanCopyUtil.copyBean(ResultBean.class, sendTradeMsgToCMBC);
+				if(sendTradeMsgToCMBC.isResultBool()){
+					resultBean = new ResultBean(null);
+					resultBean.setRespCode("0000");
+					resultBean.setRespMsg("交易成功");
+				}else{
+					resultBean = BeanCopyUtil.copyBean(ResultBean.class, sendTradeMsgToCMBC);
+				}
 			}else{
 				throw new PaymentQuickPayException("PC019");
 			}

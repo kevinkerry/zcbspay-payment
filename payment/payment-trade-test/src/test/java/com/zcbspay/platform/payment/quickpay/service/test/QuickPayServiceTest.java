@@ -26,7 +26,7 @@ public class QuickPayServiceTest extends BaseTest{
 		payBean.setCardType("1");
 		payBean.setPhone("18600806796");
 		payBean.setCertNo("110105198610094112");
-		payBean.setTn("170113061000000004");
+		payBean.setTn("170116061000000015");
 		payBean.setTxnAmt("2");
 		try {
 			ResultBean pay = quickPayService.pay(payBean);

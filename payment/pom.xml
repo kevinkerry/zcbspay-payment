@@ -19,6 +19,7 @@
 		<compiler.optimize>true</compiler.optimize>
 		<springframework.version>4.2.0.RELEASE</springframework.version>
 		<hibernate.version>4.2.0.Final</hibernate.version>
+		<rocketmq.version>3.2.6</rocketmq.version>
 		<project.version>1.0.0-SNAPSHOT</project.version>
 		<git.project>https://github.com/dmcguojia/member.git</git.project>
 	</properties>
@@ -271,5 +272,14 @@
     <module>payment-common</module>
     <module>payment-order-test</module>
     <module>payment-trade-test</module>
+    <module>payment-order-creator-api</module>
+    <module>payment-order-creator</module>
+    <module>payment-order-creator-simple</module>
+    <module>payment-fee-api</module>
+    <module>payment-fee</module>
+    <module>payment-fee-simple</module>
+    <module>payment-risk</module>
+    <module>payment-risk-api</module>
+    <module>payment-risk-simple</module>
   </modules>
 </project>

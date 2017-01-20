@@ -14,6 +14,8 @@ public class ResultBean implements Serializable {
 	private String errMsg;
 	private boolean resultBool;
 	private Object resultObj;
+	private String respCode;
+	private String respMsg;
 	
 	public ResultBean(){
 		this.resultBool=false;
@@ -75,4 +77,21 @@ public class ResultBean implements Serializable {
 	public void setResultObj(Object resultObj) {
 		this.resultObj = resultObj;
 	}
+
+	public String getRespCode() {
+		return respCode;
+	}
+
+	public void setRespCode(String respCode) {
+		this.respCode = respCode;
+	}
+
+	public String getRespMsg() {
+		return respMsg;
+	}
+
+	public void setRespMsg(String respMsg) {
+		this.respMsg = respMsg;
+	}
+	
 }
