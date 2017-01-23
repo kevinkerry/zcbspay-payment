@@ -97,7 +97,7 @@ public class QuickPayServiceImpl implements QuickPayService{
 		if(orderinfo==null){//订单不存在
 			throw new PaymentQuickPayException("PC004");
 		}
-		if("00".equals(orderinfo.getStatus())){//订单支付中
+		if("00".equals(orderinfo.getStatus())){//订单支付成功
 			throw new PaymentQuickPayException("PC022");
 		}
 		if("02".equals(orderinfo.getStatus())){//订单支付中

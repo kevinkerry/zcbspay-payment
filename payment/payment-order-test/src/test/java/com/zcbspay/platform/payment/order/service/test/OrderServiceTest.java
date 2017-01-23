@@ -17,9 +17,20 @@ public class OrderServiceTest extends BaseTest{
 
 	@Reference(version="1.0")
 	private OrderService orderService;
-	/*@Reference(version="1.0")
-	public MerchService merchService;*/
+	@Reference(version="1.0")
+	public MerchService merchService;
+	
 	@Test
+	public void testAll() throws PaymentOrderException{
+		long currentTime = System.currentTimeMillis();
+		//消费订单
+		//test_consume_order();
+		//代付订单
+		test_insteadPay_order();
+		System.out.println("excute time:"+(System.currentTimeMillis()-currentTime));
+	}
+	
+	
 	public void test_consume_order(){
 		SimpleOrderBean orderBean = new SimpleOrderBean();
 		orderBean.setBizType("000201");
@@ -41,13 +52,9 @@ public class OrderServiceTest extends BaseTest{
 			e.printStackTrace();
 		}
 	}
-	//@Test
-	public void test_query_merch(){
-		//MerchantBean merchantBean = merchService.getMerchBymemberId("200000000000610");
-		//System.out.println(JSON.toJSONString(merchantBean));
-	}
-	//@Test
+	
 	public void test_insteadPay_order() throws PaymentOrderException{
+		
 		InsteadPayOrderBean insteadPayOrderBean = new InsteadPayOrderBean();
 		insteadPayOrderBean.setBizType("000207");
 		insteadPayOrderBean.setTxnType("70");
@@ -66,5 +73,6 @@ public class OrderServiceTest extends BaseTest{
 		insteadPayOrderBean.setPhoneNo("18600806796");
 		String createInsteadPayOrder = orderService.createInsteadPayOrder(insteadPayOrderBean);
 		System.out.println("createInsteadPayOrder:"+createInsteadPayOrder);
+		
 	}
 }
