@@ -61,9 +61,9 @@
 		</property>
 		<!-- 注解方式配置 -->
 		<property name="packagesToScan">
-			<!-- <list>
+			<list>
 				<value>com.zlebank.zplatform.payment.pojo</value>			
-			</list> -->
+			</list>
 		</property>
 
 

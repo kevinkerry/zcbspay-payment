@@ -55,7 +55,8 @@ public class TxnsLogDAOImpl extends HibernateBaseDAOImpl<PojoTxnsLog> implements
 
 	private static final Logger log = LoggerFactory
 			.getLogger(TxnsLogDAOImpl.class);
-
+	@Override
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
 	public void saveTxnsLog(PojoTxnsLog txnsLog) {
 		super.saveEntity(txnsLog);
 	}
