@@ -28,19 +28,19 @@ import com.zcbspay.platform.member.merchant.bean.MerchantBean;
 import com.zcbspay.platform.member.merchant.service.MerchService;
 import com.zcbspay.platform.payment.bean.ResultBean;
 import com.zcbspay.platform.payment.commons.utils.ValidateLocator;
+import com.zcbspay.platform.payment.dao.TxnsOrderinfoDAO;
 import com.zcbspay.platform.payment.order.bean.BaseOrderBean;
 import com.zcbspay.platform.payment.order.consume.bean.ConsumeOrderBean;
 import com.zcbspay.platform.payment.order.dao.ProdCaseDAO;
 import com.zcbspay.platform.payment.order.dao.TxncodeDefDAO;
-import com.zcbspay.platform.payment.order.dao.TxnsOrderinfoDAO;
 import com.zcbspay.platform.payment.order.dao.pojo.PojoProdCase;
 import com.zcbspay.platform.payment.order.dao.pojo.PojoTxncodeDef;
-import com.zcbspay.platform.payment.order.dao.pojo.PojoTxnsOrderinfo;
 import com.zcbspay.platform.payment.order.enums.AcctStatusType;
 import com.zcbspay.platform.payment.order.enums.BusiTypeEnum;
 import com.zcbspay.platform.payment.order.exception.OrderException;
 import com.zcbspay.platform.payment.order.service.CheckOfServcie;
 import com.zcbspay.platform.payment.order.service.OrderService;
+import com.zcbspay.platform.payment.pojo.PojoTxnsOrderinfo;
 import com.zlebank.zplatform.acc.bean.enums.Usage;
 
 /**

@@ -19,13 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
+import com.zcbspay.platform.payment.dao.TxnsLogDAO;
+import com.zcbspay.platform.payment.pojo.PojoTxnsLog;
 import com.zcbspay.platform.payment.risk.bean.RiskBean;
 import com.zcbspay.platform.payment.risk.dao.RiskTradeLogDAO;
-import com.zcbspay.platform.payment.risk.dao.TxnsLogDAO;
 import com.zcbspay.platform.payment.risk.enums.RiskLevelEnum;
 import com.zcbspay.platform.payment.risk.exception.TradeRiskException;
 import com.zcbspay.platform.payment.risk.pojo.PojoRiskTradeLog;
-import com.zcbspay.platform.payment.risk.pojo.PojoTxnsLog;
 import com.zcbspay.platform.payment.risk.service.TradeRiskControlService;
 
 /**

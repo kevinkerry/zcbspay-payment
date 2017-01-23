@@ -10,7 +10,10 @@
  */
 package com.zcbspay.platform.payment.dao;
 
+import java.util.Map;
+
 import com.zcbspay.platform.payment.bean.AccountPayBean;
+import com.zcbspay.platform.payment.bean.CardBin;
 import com.zcbspay.platform.payment.bean.PayBean;
 import com.zcbspay.platform.payment.bean.ResultBean;
 import com.zcbspay.platform.payment.commons.dao.BaseDAO;
@@ -94,10 +97,59 @@ public interface TxnsLogDAO extends BaseDAO<PojoTxnsLog>{
 	 */
 	public void updateAccountPayResult(String txnseqno,ResultBean resultBean);
 	
+	
+	/**
+	 * 查询卡bin信息
+	 * @param cardNo
+	 * @return
+	 */
+	public CardBin getCard(String cardNo) ;
+	
+	
+	
 	/**
 	 * 更新交易手续费
 	 * @param txnseqno
 	 * @param fee
 	 */
 	public void updateTradeFee(String txnseqno,long fee);
+	
+	
+	/**
+	 * 获取银行卡信息
+	 * @param cardNo 银行卡号
+	 * @return
+	 */
+	public Map<String, Object> getCardInfo(String cardNo);
+	
+	/////////
+	
+	
+	
+	/**
+	 * 更新交易受理业务代码和手续费
+	 * @param txnseqno
+	 * @param busicode
+	 */
+	public void updateAccBusiCodeAndFee(String txnseqno, String busicode,String txnFee) ;
+	/**
+     * 更新应用方（账务）处理结果信息
+     * @param txnseqno
+     * @param appOrderStatus
+     * @param appOrderinfo
+     */
+    public void updateAppStatus(String txnseqno,String appOrderStatus,String appOrderinfo);
+    
+    
+	
+	
+	
+	/**
+	 * 更新交易账务结果和业务代码
+	 * @param txnseqno
+	 * @param appOrderStatus
+	 * @param appOrderinfo
+	 * @param accBusiCode
+	 */
+	public void updateAppStatus(String txnseqno, String appOrderStatus,String appOrderinfo,String accBusiCode);
 }

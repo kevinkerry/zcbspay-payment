@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
 import com.zcbspay.platform.payment.bean.AccountPayBean;
+import com.zcbspay.platform.payment.bean.CardBin;
 import com.zcbspay.platform.payment.bean.PayBean;
 import com.zcbspay.platform.payment.bean.ResultBean;
 import com.zcbspay.platform.payment.commons.dao.impl.HibernateBaseDAOImpl;
@@ -263,4 +264,122 @@ public class TxnsLogDAOImpl extends HibernateBaseDAOImpl<PojoTxnsLog> implements
 		int rows = query.executeUpdate();
 		log.info("updateTradeFee sql :{},effect rows:{}", hql, rows);
 	}
+	
+	
+	
+	@Override
+	@Transactional(readOnly=true)
+	public CardBin getCard(String cardNo) {
+        StringBuffer sqlBuffer = new StringBuffer();
+        sqlBuffer.append("SELECT t.CARDBIN as cardBin,t.CARDLEN as cardLen,t.BINLEN as BINLEN   ");
+        sqlBuffer.append(",t.CARDNAME as cardName, t.TYPE as Type,t.BANKCODE as bankCode ,  b.bankname as bankName  ");
+        sqlBuffer.append("FROM t_card_bin t  inner join  T_BANK_INSTI b on t.BANKCODE =b.BANKCODE ");
+        sqlBuffer.append("WHERE ? LIKE t.cardbin || '%'  ");
+        sqlBuffer.append("AND t.cardlen = ?  ");
+        sqlBuffer.append("ORDER BY t.cardbin DESC  ");
+        Session session=this.getSession();
+        SQLQuery sqlquery=session.createSQLQuery(sqlBuffer.toString());
+        sqlquery.setParameter(1, cardNo.intern().length());
+        sqlquery.setParameter(0, cardNo);
+//        sqlquery.setResultTransformer(new SQLColumnToBean(
+//                CardBin.class));
+        // @SuppressWarnings("unchecked")
+        //List<CardBin> li=   sqlquery.list();
+        sqlquery .setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> li=sqlquery.list();
+        if(li.isEmpty())
+            return null;
+        CardBin cardBin=new CardBin();
+        Map< String, Object> carBin= li.get(0);
+        cardBin.setBinLen( carBin.get("BINLEN")!=null?String.valueOf(carBin.get("BINLEN")):null);
+        cardBin.setCardBin( carBin.get("CARDBIN")!=null?String.valueOf(carBin.get("CARDBIN")):null);
+        cardBin.setCardLen(carBin.get("CARDLEN")!=null?String.valueOf(carBin.get("CARDLEN")):null);
+        cardBin.setCardName(carBin.get("CARDNAME")!=null?String.valueOf(carBin.get("CARDNAME")):null);
+        cardBin.setType(   carBin.get("TYPE")!=null?String.valueOf(carBin.get("TYPE")):null);
+        cardBin.setBankCode(carBin.get("BANKCODE")!=null?String.valueOf(carBin.get("BANKCODE")):null);
+        cardBin.setBankName(carBin.get("BANKNAME")!=null?String.valueOf(carBin.get("BANKNAME")):null);
+        return    cardBin;       
+                
+    //    return li.get(0);
+        
+    }
+
+	/**
+	 *
+	 * @param cardNo
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional(readOnly=true)
+	public Map<String, Object> getCardInfo(String cardNo){
+		StringBuffer sqlBuffer = new StringBuffer();
+       sqlBuffer.append("SELECT type,bankcode,bankname ");
+       sqlBuffer.append("FROM (SELECT t.TYPE,t.BANKCODE,b.bankname ");
+       sqlBuffer.append("FROM t_card_bin t, t_bank_insti b ");
+       sqlBuffer.append("WHERE t.bankcode = b.bankcode ");
+       sqlBuffer.append("AND ? LIKE t.cardbin || '%' ");
+       sqlBuffer.append("AND t.cardlen = ? ");
+       sqlBuffer.append("ORDER BY t.cardbin DESC) ");
+       sqlBuffer.append("WHERE ROWNUM = 1 ");
+       
+       SQLQuery sqlQuery = (SQLQuery) getSession().createSQLQuery(sqlBuffer.toString()).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+       sqlQuery.setParameter(0, cardNo);
+       sqlQuery.setParameter(1, cardNo.trim().length());
+       List<Map<String, Object>> routList =  (List<Map<String, Object>>)sqlQuery.list();
+      
+       if(routList.size()>0){
+           return routList.get(0);
+       }
+		return null;
+	}
+	
+	
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Throwable.class)
+	public void updateAccBusiCodeAndFee(String txnseqno, String busicode,String txnFee){
+		// TODO Auto-generated method stub
+		String hql = "update PojoTxnsLog set accbusicode = ?,txnfee = ? where txnseqno = ? ";
+		Query query = getSession().createQuery(hql);
+		query.setParameter(0, busicode);
+		query.setParameter(1, Long.valueOf(txnFee));
+		query.setParameter(2, txnseqno);
+		int rows = query.executeUpdate();
+		log.info("updateAccBusiCode() effect rows:" + rows);
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Throwable.class)
+	public void updateAppStatus(String txnseqno, String appOrderStatus,
+			String appOrderinfo) {
+		String hql = "update PojoTxnsLog set appordfintime = ?,apporderstatus = ?,apporderinfo = ? where txnseqno = ?";
+		Query query = getSession().createQuery(hql);
+		query.setParameter(0, DateUtil.getCurrentDateTime());
+		query.setParameter(1, appOrderStatus);
+		query.setParameter(2, appOrderinfo);
+		query.setParameter(3, txnseqno);
+		int rows = query.executeUpdate();
+		log.info("updateAppStatus() effect rows:" + rows);
+
+	}
+
+	
+	
+	
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Throwable.class)
+	public void updateAppStatus(String txnseqno, String appOrderStatus,String appOrderinfo,String accBusiCode) {
+		String hql = "update PojoTxnsLog set appordfintime = ?,apporderstatus = ?,apporderinfo = ?,accbusicode = ? where txnseqno = ?";
+		Query query = getSession().createQuery(hql);
+		query.setParameter(0, DateUtil.getCurrentDateTime());
+		query.setParameter(1, appOrderStatus);
+		query.setParameter(2, appOrderinfo);
+		query.setParameter(3, accBusiCode);
+		query.setParameter(4, txnseqno);
+		int rows = query.executeUpdate();
+		log.info("updateAppStatus() effect rows:" + rows);
+
+	}
+
 }

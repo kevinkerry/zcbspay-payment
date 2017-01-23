@@ -74,7 +74,8 @@
 		<!-- 注解方式配置 -->
 		<property name="packagesToScan">
 			<list>
-				<value>com.zcbspay.platform.support.risk.pojo</value>			
+				<value>com.zcbspay.platform.payment.risk.pojo</value>
+				<value>com.zcbspay.platform.payment.pojo</value>
 			</list>
 		</property>
 

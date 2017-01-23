@@ -16,9 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.zcbspay.platform.payment.dao.TxnsLogDAO;
+import com.zcbspay.platform.payment.pojo.PojoTxnsLog;
 import com.zcbspay.platform.payment.trade.acc.bean.ResultBean;
-import com.zcbspay.platform.payment.trade.acc.dao.TxnsLogDAO;
-import com.zcbspay.platform.payment.trade.acc.dao.pojo.PojoTxnsLog;
 import com.zcbspay.platform.payment.trade.acc.service.RefundAccountingService;
 import com.zlebank.zplatform.acc.bean.TradeInfo;
 import com.zlebank.zplatform.acc.bean.enums.EntryEvent;

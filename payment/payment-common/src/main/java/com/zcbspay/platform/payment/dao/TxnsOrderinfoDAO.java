@@ -59,4 +59,6 @@ public interface TxnsOrderinfoDAO extends BaseDAO<PojoTxnsOrderinfo>{
      */
     public void updateOrderToStartPay(String txnseqno)
 			throws PaymentQuickPayException ;
+    
+   
 }

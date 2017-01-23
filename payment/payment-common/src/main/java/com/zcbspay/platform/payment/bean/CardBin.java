@@ -8,7 +8,7 @@
  * Copyright (c) 2015,zlebank.All rights reserved.
  * 
  */
-package com.zcbspay.platform.payment.order.bean;
+package com.zcbspay.platform.payment.bean;
 
 /**
  * Class Description

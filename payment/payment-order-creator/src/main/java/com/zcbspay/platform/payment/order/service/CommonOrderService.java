@@ -10,18 +10,18 @@
  */
 package com.zcbspay.platform.payment.order.service;
 
-import com.zcbspay.platform.payment.order.bean.CardBin;
+import com.zcbspay.platform.payment.bean.CardBin;
 import com.zcbspay.platform.payment.order.bean.InsteadPayOrderBean;
 import com.zcbspay.platform.payment.order.bean.OrderBean;
 import com.zcbspay.platform.payment.order.bean.OrderInfoBean;
 import com.zcbspay.platform.payment.order.bean.RefundOrderBean;
 import com.zcbspay.platform.payment.order.bean.WithdrawBean;
-import com.zcbspay.platform.payment.order.dao.pojo.PojoTxnsLog;
 import com.zcbspay.platform.payment.order.enums.BusiTypeEnum;
 import com.zcbspay.platform.payment.order.exception.CommonException;
 import com.zcbspay.platform.payment.order.exception.InsteadPayOrderException;
 import com.zcbspay.platform.payment.order.exception.RefundOrderException;
 import com.zcbspay.platform.payment.order.exception.WithdrawOrderException;
+import com.zcbspay.platform.payment.pojo.PojoTxnsLog;
 
 /**
  * Class Description

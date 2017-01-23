@@ -21,14 +21,14 @@ import com.alibaba.rocketmq.client.exception.MQBrokerException;
 import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.alibaba.rocketmq.client.producer.SendResult;
 import com.alibaba.rocketmq.remoting.exception.RemotingException;
-import com.zcbspay.platform.orderinfo.producer.bean.ResultBean;
-import com.zcbspay.platform.orderinfo.producer.enums.OrderTagsEnum;
-import com.zcbspay.platform.orderinfo.producer.interfaces.Producer;
 import com.zcbspay.platform.payment.exception.PaymentOrderException;
 import com.zcbspay.platform.payment.order.bean.InsteadPayOrderBean;
 import com.zcbspay.platform.payment.order.bean.RefundOrderBean;
 import com.zcbspay.platform.payment.order.bean.SimpleOrderBean;
 import com.zcbspay.platform.payment.order.bean.WithdrawOrderBean;
+import com.zcbspay.platform.payment.order.producer.bean.ResultBean;
+import com.zcbspay.platform.payment.order.producer.enums.OrderTagsEnum;
+import com.zcbspay.platform.payment.order.producer.interfaces.Producer;
 import com.zcbspay.platform.payment.order.service.OrderService;
 
 /**

@@ -28,12 +28,12 @@ import com.zcbspay.platform.payment.order.consume.bean.ConsumeOrderBean;
 import com.zcbspay.platform.payment.order.consumer.enums.TradeStatFlagEnum;
 import com.zcbspay.platform.payment.order.dao.TxncodeDefDAO;
 import com.zcbspay.platform.payment.order.dao.pojo.PojoTxncodeDef;
-import com.zcbspay.platform.payment.order.dao.pojo.PojoTxnsLog;
 import com.zcbspay.platform.payment.order.exception.OrderException;
 import com.zcbspay.platform.payment.order.sequence.SerialNumberService;
 import com.zcbspay.platform.payment.order.service.CommonOrderService;
 import com.zcbspay.platform.payment.order.service.OrderService;
 import com.zcbspay.platform.payment.order.service.consume.AbstractConsumeOrderService;
+import com.zcbspay.platform.payment.pojo.PojoTxnsLog;
 
 /**
  * Class Description
