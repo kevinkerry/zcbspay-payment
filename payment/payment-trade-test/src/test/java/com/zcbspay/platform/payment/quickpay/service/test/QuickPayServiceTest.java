@@ -2,23 +2,25 @@ package com.zcbspay.platform.payment.quickpay.service.test;
 
 import org.junit.Test;
 
-
-
-
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
 import com.zcbspay.platform.payment.bean.ResultBean;
+import com.zcbspay.platform.payment.exception.PaymentInsteadPayException;
 import com.zcbspay.platform.payment.exception.PaymentQuickPayException;
 import com.zcbspay.platform.payment.exception.PaymentRouterException;
+import com.zcbspay.platform.payment.quickpay.bean.InsteadPayOrderBean;
 import com.zcbspay.platform.payment.quickpay.bean.PayBean;
 import com.zcbspay.platform.payment.quickpay.service.QuickPayService;
+import com.zcbspay.platform.payment.quickpay.service.RealTimeInsteadPayService;
+import com.zcbspay.platform.payment.utils.DateUtil;
 
 public class QuickPayServiceTest extends BaseTest{
 
-	@Reference(version="1.0")
+	//@Reference(version="1.0")
 	private QuickPayService quickPayService;
+	@Reference(version="1.0")
+	private RealTimeInsteadPayService realTimeInsteadPayService;
 	
-	@Test
 	public void test_pay(){
 		PayBean payBean = new PayBean();
 		payBean.setCardNo("6228480018543668979");
@@ -37,6 +39,34 @@ public class QuickPayServiceTest extends BaseTest{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (PaymentRouterException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	@Test
+	public void test_instead_pay(){
+		com.zcbspay.platform.payment.quickpay.bean.InsteadPayOrderBean insteadPayOrderBean = new InsteadPayOrderBean();
+		insteadPayOrderBean.setBizType("000207");
+		insteadPayOrderBean.setTxnType("70");
+		insteadPayOrderBean.setTxnSubType("00");
+		insteadPayOrderBean.setCoopInstiId("300000000000004");
+		insteadPayOrderBean.setCurrencyCode("156");
+		insteadPayOrderBean.setMerId("200000000000610");
+		insteadPayOrderBean.setTxnTime(DateUtil.getCurrentDateTime());
+		insteadPayOrderBean.setTxnAmt("2");
+		insteadPayOrderBean.setAccNo("6228480018543668979");
+		insteadPayOrderBean.setAccName("郭佳");
+		insteadPayOrderBean.setAccType("01");
+		insteadPayOrderBean.setCertifId("110105198610094112");
+		insteadPayOrderBean.setCertifTp("01");
+		insteadPayOrderBean.setPhoneNo("18600806796");
+		insteadPayOrderBean.setTn("170122061000000040");
+		insteadPayOrderBean.setOrderId("1485068751913");
+		try {
+			ResultBean singleInsteadPay = realTimeInsteadPayService.singleInsteadPay(insteadPayOrderBean);
+			System.out.println(JSON.toJSONString(singleInsteadPay));
+		} catch (PaymentInsteadPayException | PaymentQuickPayException
+				| PaymentRouterException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

@@ -412,7 +412,7 @@ public class PojoInsteadPayRealtime implements java.io.Serializable {
 		this.retInfo = retInfo;
 	}
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "CREATE_TIME", length = 7)
 	public Date getCreateTime() {
 		return this.createTime;
@@ -422,7 +422,7 @@ public class PojoInsteadPayRealtime implements java.io.Serializable {
 		this.createTime = createTime;
 	}
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "UPDATE_TIME", length = 7)
 	public Date getUpdateTime() {
 		return this.updateTime;

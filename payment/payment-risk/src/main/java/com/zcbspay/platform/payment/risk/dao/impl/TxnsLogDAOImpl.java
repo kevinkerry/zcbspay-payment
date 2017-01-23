@@ -8,7 +8,7 @@
  * Copyright (c) 2016,zlebank.All rights reserved.
  * 
  */
-package com.zcbspay.platform.support.risk.dao.impl;
+package com.zcbspay.platform.payment.risk.dao.impl;
 
 import java.util.List;
 import java.util.Map;
@@ -21,8 +21,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.zcbspay.platform.payment.commons.dao.impl.HibernateBaseDAOImpl;
-import com.zcbspay.platform.support.risk.dao.TxnsLogDAO;
-import com.zcbspay.platform.support.risk.pojo.PojoTxnsLog;
+import com.zcbspay.platform.payment.risk.dao.TxnsLogDAO;
+import com.zcbspay.platform.payment.risk.pojo.PojoTxnsLog;
 
 /**
  * Class Description

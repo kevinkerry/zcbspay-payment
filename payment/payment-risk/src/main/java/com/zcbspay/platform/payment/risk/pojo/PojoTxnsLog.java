@@ -8,7 +8,7 @@
  * Copyright (c) 2016,zlebank.All rights reserved.
  * 
  */
-package com.zcbspay.platform.support.risk.pojo;
+package com.zcbspay.platform.payment.risk.pojo;
 
 import java.io.Serializable;
 

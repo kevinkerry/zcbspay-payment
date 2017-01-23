@@ -8,14 +8,14 @@
  * Copyright (c) 2016,zlebank.All rights reserved.
  * 
  */
-package com.zcbspay.platform.support.risk.dao;
+package com.zcbspay.platform.payment.risk.dao;
 
 import java.util.List;
 import java.util.Map;
 
 import com.zcbspay.platform.payment.commons.dao.BaseDAO;
-import com.zcbspay.platform.support.risk.bean.RiskBean;
-import com.zcbspay.platform.support.risk.pojo.PojoRiskTradeLog;
+import com.zcbspay.platform.payment.risk.bean.RiskBean;
+import com.zcbspay.platform.payment.risk.pojo.PojoRiskTradeLog;
 
 /**
  * Class Description

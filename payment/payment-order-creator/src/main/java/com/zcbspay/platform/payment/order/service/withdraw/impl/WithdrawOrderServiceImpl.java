@@ -22,8 +22,12 @@ import com.zcbspay.platform.member.individual.bean.QuickpayCustBean;
 import com.zcbspay.platform.member.individual.service.MemberBankCardService;
 import com.zcbspay.platform.member.merchant.bean.MerchantBean;
 import com.zcbspay.platform.member.merchant.service.MerchService;
+import com.zcbspay.platform.payment.bean.ResultBean;
 import com.zcbspay.platform.payment.commons.utils.Constant;
 import com.zcbspay.platform.payment.commons.utils.DateUtil;
+import com.zcbspay.platform.payment.fee.bean.FeeBean;
+import com.zcbspay.platform.payment.fee.exception.TradeFeeException;
+import com.zcbspay.platform.payment.fee.service.TradeFeeService;
 import com.zcbspay.platform.payment.order.bean.BaseOrderBean;
 import com.zcbspay.platform.payment.order.dao.TxncodeDefDAO;
 import com.zcbspay.platform.payment.order.dao.TxnsLogDAO;
@@ -39,14 +43,10 @@ import com.zcbspay.platform.payment.order.service.OrderService;
 import com.zcbspay.platform.payment.order.service.withdraw.AbstractWithdrawOrderService;
 import com.zcbspay.platform.payment.order.withdraw.bean.WithdrawAccBean;
 import com.zcbspay.platform.payment.order.withdraw.bean.WithdrawOrderBean;
-import com.zcbspay.platform.support.fee.bean.FeeBean;
-import com.zcbspay.platform.support.fee.exception.TradeFeeException;
-import com.zcbspay.platform.support.fee.service.TradeFeeService;
-import com.zcbspay.platform.support.risk.bean.RiskBean;
-import com.zcbspay.platform.support.risk.exception.TradeRiskException;
-import com.zcbspay.platform.support.risk.service.TradeRiskControlService;
-import com.zcbspay.platform.support.trade.acc.bean.ResultBean;
-import com.zcbspay.platform.support.trade.acc.service.WithdrawAccountingService;
+import com.zcbspay.platform.payment.risk.bean.RiskBean;
+import com.zcbspay.platform.payment.risk.exception.TradeRiskException;
+import com.zcbspay.platform.payment.risk.service.TradeRiskControlService;
+import com.zcbspay.platform.payment.trade.acc.service.WithdrawAccountingService;
 
 /**
  * Class Description
@@ -284,7 +284,7 @@ public class WithdrawOrderServiceImpl extends AbstractWithdrawOrderService
 		riskBean.setTxnAmt(txnsLog.getAmount() + "");
 		riskBean.setTxnseqno(txnsLog.getTxnseqno());
 		tradeRiskControlService.realTimeTradeRiskControl(riskBean);
-		ResultBean resultBean = withdrawAccountingService.withdrawApply(txnsLog
+		com.zcbspay.platform.payment.trade.acc.bean.ResultBean resultBean = withdrawAccountingService.withdrawApply(txnsLog
 				.getTxnseqno());
 
 		if (resultBean.isResultBool()) {

@@ -18,9 +18,13 @@ import com.zcbspay.platform.member.coopinsti.service.CoopInstiProductService;
 import com.zcbspay.platform.member.coopinsti.service.CoopInstiService;
 import com.zcbspay.platform.member.merchant.bean.MerchantBean;
 import com.zcbspay.platform.member.merchant.service.MerchService;
+import com.zcbspay.platform.payment.bean.ResultBean;
 import com.zcbspay.platform.payment.commons.utils.BeanCopyUtil;
 import com.zcbspay.platform.payment.commons.utils.Constant;
 import com.zcbspay.platform.payment.commons.utils.DateUtil;
+import com.zcbspay.platform.payment.fee.bean.FeeBean;
+import com.zcbspay.platform.payment.fee.exception.TradeFeeException;
+import com.zcbspay.platform.payment.fee.service.TradeFeeService;
 import com.zcbspay.platform.payment.order.bean.OrderBean;
 import com.zcbspay.platform.payment.order.bean.RefundOrderBean;
 import com.zcbspay.platform.payment.order.dao.TxncodeDefDAO;
@@ -38,15 +42,10 @@ import com.zcbspay.platform.payment.order.exception.RefundOrderException;
 import com.zcbspay.platform.payment.order.sequence.SerialNumberService;
 import com.zcbspay.platform.payment.order.service.CommonOrderService;
 import com.zcbspay.platform.payment.order.service.RefundOrderService;
-import com.zcbspay.platform.support.fee.bean.FeeBean;
-import com.zcbspay.platform.support.fee.exception.TradeFeeException;
-import com.zcbspay.platform.support.fee.service.TradeFeeService;
-import com.zcbspay.platform.support.risk.bean.RiskBean;
-import com.zcbspay.platform.support.risk.exception.TradeRiskException;
-import com.zcbspay.platform.support.risk.service.TradeRiskControlService;
-import com.zcbspay.platform.support.trade.acc.bean.ResultBean;
-import com.zcbspay.platform.support.trade.acc.service.RefundAccountingService;
-
+import com.zcbspay.platform.payment.risk.bean.RiskBean;
+import com.zcbspay.platform.payment.risk.exception.TradeRiskException;
+import com.zcbspay.platform.payment.risk.service.TradeRiskControlService;
+import com.zcbspay.platform.payment.trade.acc.service.RefundAccountingService;
 /**
  * Class Description
  *
@@ -237,7 +236,7 @@ public class RefundOrderServiceImpl implements RefundOrderService {
 		}
 		txnsLog.setTxnfee(fee);
 		txnsLogDAO.saveTxnsLog(txnsLog);
-		ResultBean resultBean = refundAccountingService
+		com.zcbspay.platform.payment.trade.acc.bean.ResultBean resultBean = refundAccountingService
 				.refundApply(txnsLog.getTxnseqno());
 		if (!resultBean.isResultBool()) {
 			throw new RefundOrderException("OD041");

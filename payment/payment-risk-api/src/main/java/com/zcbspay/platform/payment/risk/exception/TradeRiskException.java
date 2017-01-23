@@ -8,7 +8,7 @@
  * Copyright (c) 2016,zlebank.All rights reserved.
  * 
  */
-package com.zcbspay.platform.support.risk.exception;
+package com.zcbspay.platform.payment.risk.exception;
 
 /**
  * Class Description

@@ -8,7 +8,7 @@
  * Copyright (c) 2015,zlebank.All rights reserved.
  * 
  */
-package com.zcbspay.platform.support.risk.enums;
+package com.zcbspay.platform.payment.risk.enums;
 
 
 /**

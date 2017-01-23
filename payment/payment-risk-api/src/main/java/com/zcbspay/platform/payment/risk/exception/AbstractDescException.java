@@ -1,4 +1,4 @@
-package com.zcbspay.platform.support.risk.exception;
+package com.zcbspay.platform.payment.risk.exception;
 
 import java.util.ResourceBundle;
 

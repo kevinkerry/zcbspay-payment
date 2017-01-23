@@ -8,7 +8,7 @@
  * Copyright (c) 2016,zlebank.All rights reserved.
  * 
  */
-package com.zcbspay.platform.support.risk.service.impl;
+package com.zcbspay.platform.payment.risk.service.impl;
 
 import java.util.List;
 import java.util.Map;
@@ -19,14 +19,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
-import com.zcbspay.platform.support.risk.bean.RiskBean;
-import com.zcbspay.platform.support.risk.dao.RiskTradeLogDAO;
-import com.zcbspay.platform.support.risk.dao.TxnsLogDAO;
-import com.zcbspay.platform.support.risk.enums.RiskLevelEnum;
-import com.zcbspay.platform.support.risk.exception.TradeRiskException;
-import com.zcbspay.platform.support.risk.pojo.PojoRiskTradeLog;
-import com.zcbspay.platform.support.risk.pojo.PojoTxnsLog;
-import com.zcbspay.platform.support.risk.service.TradeRiskControlService;
+import com.zcbspay.platform.payment.risk.bean.RiskBean;
+import com.zcbspay.platform.payment.risk.dao.RiskTradeLogDAO;
+import com.zcbspay.platform.payment.risk.dao.TxnsLogDAO;
+import com.zcbspay.platform.payment.risk.enums.RiskLevelEnum;
+import com.zcbspay.platform.payment.risk.exception.TradeRiskException;
+import com.zcbspay.platform.payment.risk.pojo.PojoRiskTradeLog;
+import com.zcbspay.platform.payment.risk.pojo.PojoTxnsLog;
+import com.zcbspay.platform.payment.risk.service.TradeRiskControlService;
 
 /**
  * Class Description

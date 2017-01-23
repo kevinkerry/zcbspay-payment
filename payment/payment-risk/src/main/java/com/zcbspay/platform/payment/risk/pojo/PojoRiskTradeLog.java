@@ -1,4 +1,4 @@
-package com.zcbspay.platform.support.risk.pojo;
+package com.zcbspay.platform.payment.risk.pojo;
 // default package
 // Generated 2015-12-28 9:41:05 by Hibernate Tools 4.0.0
 

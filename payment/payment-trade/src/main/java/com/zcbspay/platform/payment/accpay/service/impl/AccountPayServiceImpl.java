@@ -24,12 +24,12 @@ import com.zcbspay.platform.payment.dao.TxnsOrderinfoDAO;
 import com.zcbspay.platform.payment.enums.TradeStatFlagEnum;
 import com.zcbspay.platform.payment.exception.PaymentAccountPayException;
 import com.zcbspay.platform.payment.exception.PaymentQuickPayException;
+import com.zcbspay.platform.payment.fee.bean.FeeBean;
+import com.zcbspay.platform.payment.fee.exception.TradeFeeException;
+import com.zcbspay.platform.payment.fee.service.TradeFeeService;
 import com.zcbspay.platform.payment.pojo.PojoTxnsLog;
 import com.zcbspay.platform.payment.pojo.PojoTxnsOrderinfo;
-import com.zcbspay.platform.support.fee.bean.FeeBean;
-import com.zcbspay.platform.support.fee.exception.TradeFeeException;
-import com.zcbspay.platform.support.fee.service.TradeFeeService;
-import com.zcbspay.platform.support.trade.acc.service.TradeAccountingService;
+import com.zcbspay.platform.payment.trade.acc.service.TradeAccountingService;
 
 /**
  * Class Description
@@ -118,7 +118,7 @@ public class AccountPayServiceImpl implements AccountPayService {
 			e1.printStackTrace();
 			throw new PaymentAccountPayException("PC028");
 		}
-		com.zcbspay.platform.support.trade.acc.bean.ResultBean accountingForResultBean = tradeAccountingService.accountingForSync(txnsLog.getTxnseqno());
+		com.zcbspay.platform.payment.trade.acc.bean.ResultBean accountingForResultBean = tradeAccountingService.accountingForSync(txnsLog.getTxnseqno());
 		ResultBean resultBean = BeanCopyUtil.copyBean(ResultBean.class, accountingForResultBean);
 		txnsLogDAO.updateAccountPayResult(payBean.getTxnseqno(), resultBean);
 		return resultBean;

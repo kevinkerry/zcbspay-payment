@@ -8,10 +8,10 @@
  * Copyright (c) 2016,zlebank.All rights reserved.
  * 
  */
-package com.zcbspay.platform.support.risk.service;
+package com.zcbspay.platform.payment.risk.service;
 
-import com.zcbspay.platform.support.risk.bean.RiskBean;
-import com.zcbspay.platform.support.risk.exception.TradeRiskException;
+import com.zcbspay.platform.payment.risk.bean.RiskBean;
+import com.zcbspay.platform.payment.risk.exception.TradeRiskException;
 
 /**
  * 交易风控service

@@ -40,7 +40,7 @@ import com.zcbspay.platform.payment.order.exception.OrderException;
 import com.zcbspay.platform.payment.order.service.CheckOfServcie;
 import com.zcbspay.platform.payment.order.service.OrderService;
 import com.zcbspay.platform.payment.order.withdraw.bean.WithdrawOrderBean;
-import com.zcbspay.platform.support.risk.exception.TradeRiskException;
+import com.zcbspay.platform.payment.risk.exception.TradeRiskException;
 import com.zlebank.zplatform.acc.bean.enums.Usage;
 
 /**
