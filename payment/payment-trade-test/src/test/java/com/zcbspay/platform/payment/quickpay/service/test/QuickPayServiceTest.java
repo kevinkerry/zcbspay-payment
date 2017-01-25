@@ -24,22 +24,22 @@ public class QuickPayServiceTest extends BaseTest{
 	@Test
 	public void testAll(){
 		//实时代收
-		//test_pay();
+		//test_pay("");
 		//实时代付
-		test_instead_pay();
+		test_instead_pay("170123061000000006");
 	}
 	
 	
 	
 	//@Test
-	public void test_pay(){
+	public void test_pay(String tn){
 		PayBean payBean = new PayBean();
 		payBean.setCardNo("6228480018543668979");
 		payBean.setCardKeeper("郭佳");
 		payBean.setCardType("1");
 		payBean.setPhone("18600806796");
 		payBean.setCertNo("110105198610094112");
-		payBean.setTn("170123061000000029");
+		payBean.setTn(tn);
 		payBean.setTxnAmt("2");
 		try {
 			ResultBean pay = quickPayService.pay(payBean);
@@ -55,7 +55,7 @@ public class QuickPayServiceTest extends BaseTest{
 		}
 	}
 	//@Test
-	public void test_instead_pay(){
+	public void test_instead_pay(String tn){
 		com.zcbspay.platform.payment.quickpay.bean.InsteadPayOrderBean insteadPayOrderBean = new InsteadPayOrderBean();
 		insteadPayOrderBean.setBizType("000207");
 		insteadPayOrderBean.setTxnType("70");
@@ -71,7 +71,7 @@ public class QuickPayServiceTest extends BaseTest{
 		insteadPayOrderBean.setCertifId("110105198610094112");
 		insteadPayOrderBean.setCertifTp("01");
 		insteadPayOrderBean.setPhoneNo("18600806796");
-		insteadPayOrderBean.setTn("170123061000000028");
+		insteadPayOrderBean.setTn(tn);
 		insteadPayOrderBean.setOrderId("1485068751913");
 		try {
 			ResultBean singleInsteadPay = realTimeInsteadPayService.singleInsteadPay(insteadPayOrderBean);
