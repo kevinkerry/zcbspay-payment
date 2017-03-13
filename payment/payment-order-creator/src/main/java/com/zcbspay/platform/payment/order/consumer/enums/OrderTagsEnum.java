@@ -35,7 +35,15 @@ public enum OrderTagsEnum {
 	/**提现订单*/
 	WITHDRAW_SIMPLIFIED("TAG_007"),
 	/**充值订单*/
-	RECHARGE_SIMPLIFIED("TAG_008");
+	RECHARGE_SIMPLIFIED("TAG_008"),
+	/**集中代收-实时*/
+	CONCENTRATE_COLLECTION_CHARGES_REALTIME("TAG_009"),
+	/**集中代付-实时*/
+	CONCENTRATE_PAYMENT_REALTIME("TAG_010"),
+	/**集中代收-批量*/
+	CONCENTRATE_COLLECTION_CHARGES_BATCH("TAG_011"),
+	/**集中代付-批量*/
+	CONCENTRATE_PAYMENT_BATCH("TAG_012");
 	private String code;
 
 	/**

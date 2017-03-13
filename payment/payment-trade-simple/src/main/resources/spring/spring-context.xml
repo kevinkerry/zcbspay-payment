@@ -45,6 +45,10 @@
             init-method="init"  
             destroy-method="closeProducer"
             scope="singleton"/>
+	<bean id="unionpayWithholdingProducer" class="com.zcbspay.platform.channel.unionpay.spring.WithholdingSpringProducer"
+            init-method="init"  
+            destroy-method="closeProducer"
+            scope="singleton"/>
 	<import resource="classpath:/spring-hibernate.xml"/>
 	<import resource="classpath:/spring-dubbo.xml"/>
 </beans>

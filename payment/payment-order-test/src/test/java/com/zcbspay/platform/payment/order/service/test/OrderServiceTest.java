@@ -24,9 +24,9 @@ public class OrderServiceTest extends BaseTest{
 	public void testAll() throws PaymentOrderException{
 		long currentTime = System.currentTimeMillis();
 		//消费订单
-		//test_consume_order();
+		test_consume_order();
 		//代付订单
-		test_insteadPay_order();
+		//test_insteadPay_order();
 		System.out.println("excute time:"+(System.currentTimeMillis()-currentTime));
 	}
 	
@@ -40,7 +40,7 @@ public class OrderServiceTest extends BaseTest{
 		orderBean.setCurrencyCode("156");
 		orderBean.setMerId("200000000000610");
 		orderBean.setTxnTime(DateUtil.getCurrentDateTime());
-		orderBean.setTxnAmt("2");
+		orderBean.setTxnAmt("201");
 		orderBean.setOrderTimeout("20170202000000");
 		orderBean.setMemberId("999999999999999");
 		orderBean.setOrderId(System.currentTimeMillis()+"");

@@ -1,5 +1,7 @@
 package com.zcbspay.platform.payment.order.enums;
 
+import com.zcbspay.platform.payment.order.consume.bean.ConcentrateSingleOrderBean;
+
 /**
  * 业务类型枚举
  * Class Description
@@ -11,7 +13,7 @@ package com.zcbspay.platform.payment.order.enums;
  */
 public enum BusiTypeEnum {
     /**
-     *  (消费类：1000；充值类：2000；提现类：3000；退款类：4000；转账类：5000；保障金：6000;代付类:7000)
+     *  (消费类：1000；充值类：2000；提现类：3000；退款类：4000；转账类：5000；保障金：6000;代付类:7000,集中代收付：1100)
      */
     consumption("1000"),
     charge("2000"),
@@ -20,6 +22,7 @@ public enum BusiTypeEnum {
     transfer ("5000"),
     safeGuard("6000"),
     insteadPay("7000"),
+    CONCENTRATE("1100"),
     UNKNOW("99");
     private String code;
     

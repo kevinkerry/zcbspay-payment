@@ -13,6 +13,8 @@ package com.zcbspay.platform.payment.quickpay.service.impl;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -60,6 +62,7 @@ import com.zcbspay.platform.payment.validate.bean.PayCheckBean;
 @Service("quickPayService")
 public class QuickPayServiceImpl implements QuickPayService{
 
+	private static final Logger logger = LoggerFactory.getLogger(QuickPayServiceImpl.class);
 	@Autowired
 	private TxnsOrderinfoDAO txnsOrderinfoDAO;
 	@Autowired
@@ -69,10 +72,11 @@ public class QuickPayServiceImpl implements QuickPayService{
 	@Autowired
 	@Qualifier("cmbcWithholdingProducer")
 	private Producer producer_cmbc_withhold;
+	@Autowired
+	@Qualifier("unionpayWithholdingProducer")
+	private com.zcbspay.platform.channel.unionpay.interfaces.Producer producer_un_withhold;
 	@Reference(version="1.0")
 	private TradeRiskControlService tradeRiskControlService;
-	//@Autowired
-	//private MemberBankCardService memberBankCardService;
 	@Reference(version="1.0")
 	private TradeFeeService tradeFeeService;
 	/**
@@ -132,9 +136,7 @@ public class QuickPayServiceImpl implements QuickPayService{
 			throw new PaymentRouterException("PC012");
 			
 		}
-		//txnsLogDAO.riskTradeControl(txnsLog.getTxnseqno(),txnsLog.getAccfirmerno(),txnsLog.getAccsecmerno(),txnsLog.getAccmemberid(),txnsLog.getBusicode(),txnsLog.getAmount()+"",payBean.getCardType(),payBean.getCardNo());
 		txnsLogDAO.initretMsg(txnsLog.getTxnseqno());
-		//txnsLogDAO.updateBankCardInfo(txnsLog.getTxnseqno(), payBean);
 		txnsOrderinfoDAO.updateOrderToStartPay(txnsLog.getTxnseqno());
 		txnsLogDAO.updateTradeStatFlag(txnsLog.getTxnseqno(), TradeStatFlagEnum.READY);
 		//计算交易手续费
@@ -178,9 +180,24 @@ public class QuickPayServiceImpl implements QuickPayService{
 				}else{
 					resultBean = BeanCopyUtil.copyBean(ResultBean.class, sendTradeMsgToCMBC);
 				}
-			}else{
+			}else if(channelEnmu==ChannelEnmu.CHINAPAYTJ){//银联在线-天津
+				com.zcbspay.platform.channel.unionpay.bean.ResultBean sendTradeMsgToCHINAPAYTJ = sendTradeMsgToCHINAPAYTJ(tradeBean);
+				if(sendTradeMsgToCHINAPAYTJ==null){
+					throw new PaymentQuickPayException("PC019");
+				}
+				resultBean = BeanCopyUtil.copyBean(ResultBean.class, sendTradeMsgToCHINAPAYTJ);
+				if(sendTradeMsgToCHINAPAYTJ.isResultBool()){
+					resultBean = new ResultBean(null);
+					resultBean.setRespCode("0000");
+					resultBean.setRespMsg("交易成功");
+				}else{
+					resultBean = BeanCopyUtil.copyBean(ResultBean.class, sendTradeMsgToCHINAPAYTJ);
+				}
+			}
+			else{
 				throw new PaymentQuickPayException("PC019");
 			}
+			
 		} catch (MQClientException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -207,13 +224,18 @@ public class QuickPayServiceImpl implements QuickPayService{
 	}
 	
 	private com.zcbspay.platform.channel.simulation.bean.ResultBean sendTradeMsgToCMBC(TradeBean tradeBean) throws MQClientException, RemotingException, InterruptedException, MQBrokerException{
-		//Producer producer = new WithholdingProducer(ResourceBundle.getBundle("producer_cmbc").getString("single.namesrv.addr"), WithholdingTagsEnum.WITHHOLDING);
 		SendResult sendResult = producer_cmbc_withhold.sendJsonMessage(JSON.toJSONString(tradeBean),WithholdingTagsEnum.WITHHOLDING);
 		com.zcbspay.platform.channel.simulation.bean.ResultBean queryReturnResult = producer_cmbc_withhold.queryReturnResult(sendResult);
-		System.out.println(JSON.toJSONString(queryReturnResult));
+		logger.info(JSON.toJSONString(queryReturnResult));
 		return queryReturnResult;
 	}
 	
+	private com.zcbspay.platform.channel.unionpay.bean.ResultBean sendTradeMsgToCHINAPAYTJ(TradeBean tradeBean) throws MQClientException, RemotingException, InterruptedException, MQBrokerException {
+		SendResult sendResult = producer_un_withhold.sendJsonMessage(JSON.toJSONString(tradeBean),com.zcbspay.platform.channel.unionpay.enums.WithholdingTagsEnum.WITHHOLDING);
+		com.zcbspay.platform.channel.unionpay.bean.ResultBean queryReturnResult = producer_un_withhold.queryReturnResult(sendResult);
+		logger.info(JSON.toJSONString(queryReturnResult));
+		return queryReturnResult;
+	}
 	
 	private void checkPayment(PayBean payBean) throws PaymentQuickPayException{
 		PayCheckBean copyBean = BeanCopyUtil.copyBean(PayCheckBean.class, payBean);

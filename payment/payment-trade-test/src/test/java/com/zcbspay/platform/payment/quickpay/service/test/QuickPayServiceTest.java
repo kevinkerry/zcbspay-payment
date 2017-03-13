@@ -1,6 +1,8 @@
 package com.zcbspay.platform.payment.quickpay.service.test;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
@@ -16,6 +18,7 @@ import com.zcbspay.platform.payment.utils.DateUtil;
 
 public class QuickPayServiceTest extends BaseTest{
 
+	private static final Logger logger = LoggerFactory.getLogger(QuickPayServiceTest.class);
 	@Reference(version="1.0")
 	private QuickPayService quickPayService;
 	@Reference(version="1.0")
@@ -24,9 +27,9 @@ public class QuickPayServiceTest extends BaseTest{
 	@Test
 	public void testAll(){
 		//实时代收
-		//test_pay("");
+		test_pay("170222061000000028");
 		//实时代付
-		test_instead_pay("170123061000000006");
+		//test_instead_pay("170220061000000009");
 	}
 	
 	
@@ -40,12 +43,10 @@ public class QuickPayServiceTest extends BaseTest{
 		payBean.setPhone("18600806796");
 		payBean.setCertNo("110105198610094112");
 		payBean.setTn(tn);
-		payBean.setTxnAmt("2");
+		payBean.setTxnAmt("201");
 		try {
 			ResultBean pay = quickPayService.pay(payBean);
-			
-			
-			System.out.println(JSON.toJSONString(pay));
+			logger.info(JSON.toJSONString(pay));
 		} catch (PaymentQuickPayException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -75,7 +76,7 @@ public class QuickPayServiceTest extends BaseTest{
 		insteadPayOrderBean.setOrderId("1485068751913");
 		try {
 			ResultBean singleInsteadPay = realTimeInsteadPayService.singleInsteadPay(insteadPayOrderBean);
-			System.out.println(JSON.toJSONString(singleInsteadPay));
+			logger.info(JSON.toJSONString(singleInsteadPay));
 		} catch (PaymentInsteadPayException | PaymentQuickPayException
 				| PaymentRouterException e) {
 			// TODO Auto-generated catch block

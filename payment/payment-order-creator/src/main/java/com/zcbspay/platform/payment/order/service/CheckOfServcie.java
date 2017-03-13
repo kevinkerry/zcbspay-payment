@@ -11,6 +11,7 @@
 package com.zcbspay.platform.payment.order.service;
 
 import com.zcbspay.platform.payment.order.bean.BaseOrderBean;
+import com.zcbspay.platform.payment.order.consume.bean.ConcentrateSingleOrderBean;
 import com.zcbspay.platform.payment.order.exception.OrderException;
 
 /**

@@ -30,6 +30,7 @@ import com.zcbspay.platform.payment.bean.ResultBean;
 import com.zcbspay.platform.payment.commons.utils.ValidateLocator;
 import com.zcbspay.platform.payment.dao.TxnsOrderinfoDAO;
 import com.zcbspay.platform.payment.order.bean.BaseOrderBean;
+import com.zcbspay.platform.payment.order.consume.bean.ConcentrateSingleOrderBean;
 import com.zcbspay.platform.payment.order.consume.bean.ConsumeOrderBean;
 import com.zcbspay.platform.payment.order.dao.ProdCaseDAO;
 import com.zcbspay.platform.payment.order.dao.TxncodeDefDAO;
@@ -251,4 +252,6 @@ public abstract class AbstractConsumeOrderService implements CheckOfServcie<Cons
 	 * @throws OrderException 
 	 */
 	public abstract String saveConsumeOrder(BaseOrderBean baseOrderBean) throws OrderException;
+	
+	
 }
