@@ -1,5 +1,7 @@
 package com.zcbspay.platform.payment.order.service.concentrate.impl;
 
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,23 +10,26 @@ import org.springframework.stereotype.Service;
 
 import com.zcbspay.platform.member.coopinsti.service.CoopInstiProductService;
 import com.zcbspay.platform.member.coopinsti.service.CoopInstiService;
-import com.zcbspay.platform.member.individual.bean.MemberBean;
-import com.zcbspay.platform.member.individual.bean.enums.MemberType;
 import com.zcbspay.platform.member.individual.service.MemberInfoService;
 import com.zcbspay.platform.member.merchant.bean.MerchantBean;
 import com.zcbspay.platform.member.merchant.service.MerchService;
 import com.zcbspay.platform.payment.bean.ResultBean;
 import com.zcbspay.platform.payment.commons.utils.DateUtil;
 import com.zcbspay.platform.payment.commons.utils.ValidateLocator;
+import com.zcbspay.platform.payment.dao.OrderCollectBatchDAO;
+import com.zcbspay.platform.payment.dao.OrderCollectDetaDAO;
+import com.zcbspay.platform.payment.dao.OrderCollectSingleDAO;
+import com.zcbspay.platform.payment.dao.OrderPaymentBatchDAO;
+import com.zcbspay.platform.payment.dao.OrderPaymentDetaDAO;
+import com.zcbspay.platform.payment.dao.OrderPaymentSingleDAO;
+import com.zcbspay.platform.payment.enums.OrderStatusEnum;
 import com.zcbspay.platform.payment.order.bean.BaseOrderBean;
+import com.zcbspay.platform.payment.order.consume.bean.ConcentrateBatchOrderBean;
+import com.zcbspay.platform.payment.order.consume.bean.ConcentrateOrderDetaBean;
 import com.zcbspay.platform.payment.order.consume.bean.ConcentrateSingleOrderBean;
 import com.zcbspay.platform.payment.order.consumer.enums.TradeStatFlagEnum;
-import com.zcbspay.platform.payment.order.dao.OrderCollectSingleDAO;
-import com.zcbspay.platform.payment.order.dao.OrderPaymentSingleDAO;
 import com.zcbspay.platform.payment.order.dao.ProdCaseDAO;
 import com.zcbspay.platform.payment.order.dao.TxncodeDefDAO;
-import com.zcbspay.platform.payment.order.dao.pojo.OrderCollectSingleDO;
-import com.zcbspay.platform.payment.order.dao.pojo.OrderPaymentSingleDO;
 import com.zcbspay.platform.payment.order.dao.pojo.PojoProdCase;
 import com.zcbspay.platform.payment.order.dao.pojo.PojoTxncodeDef;
 import com.zcbspay.platform.payment.order.enums.BusiTypeEnum;
@@ -33,6 +38,12 @@ import com.zcbspay.platform.payment.order.sequence.SerialNumberService;
 import com.zcbspay.platform.payment.order.service.CommonOrderService;
 import com.zcbspay.platform.payment.order.service.concentrate.ConcentrateOrderService;
 import com.zcbspay.platform.payment.order.service.consume.AbstractConsumeOrderService;
+import com.zcbspay.platform.payment.pojo.OrderCollectBatchDO;
+import com.zcbspay.platform.payment.pojo.OrderCollectDetaDO;
+import com.zcbspay.platform.payment.pojo.OrderCollectSingleDO;
+import com.zcbspay.platform.payment.pojo.OrderPaymentBatchDO;
+import com.zcbspay.platform.payment.pojo.OrderPaymentDetaDO;
+import com.zcbspay.platform.payment.pojo.OrderPaymentSingleDO;
 import com.zcbspay.platform.payment.pojo.PojoTxnsLog;
 @Service
 public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
@@ -59,6 +70,14 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 	private OrderPaymentSingleDAO orderPaymentSingleDAO;
 	@Autowired
 	private ProdCaseDAO prodCaseDAO;
+	@Autowired
+	private OrderCollectBatchDAO orderCollectBatchDAO;
+	@Autowired
+	private OrderCollectDetaDAO orderCollectDetaDAO;
+	@Autowired
+	private OrderPaymentBatchDAO orderPaymentBatchDAO;
+	@Autowired
+	private OrderPaymentDetaDAO orderPaymentDetaDAO;
 	@Override
 	public String createRealTimeCollectionOrder(
 			ConcentrateSingleOrderBean orderBean) {
@@ -215,7 +234,7 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 		orderCollectSingle.setSummary(orderBean.getSummary());
 		orderCollectSingle.setOrderdesc(orderBean.getOrderDesc());
 		orderCollectSingle.setReserved(orderBean.getReserved());
-		orderCollectSingle.setStatus("01");
+		orderCollectSingle.setStatus(OrderStatusEnum.INITIAL.value());
 		orderCollectSingle.setOrdercommitime(orderBean.getTxnTime());
 		return orderCollectSingle;
 	}
@@ -278,8 +297,8 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 			if(StringUtils.isNotEmpty(tn)){
 				return null;
 			}
-			checkOfOrder(orderBean);
-			checkOfRepeatSubmit(orderBean);
+			checkOfPaymentSecondPay(orderBean);
+			checkOfPaymentRepeatSubmit(orderBean);
 			checkOfBusiness(orderBean);
 			tn = savePaymentOrder(orderBean);
 		} catch (OrderException e) {
@@ -288,7 +307,49 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 		}
 		return tn;
 	}
-
+	/**
+	 * 检查订单是否为二次提交
+	 * @param orderBean
+	 * @throws OrderException
+	 */
+	
+	public void checkOfPaymentRepeatSubmit(ConcentrateSingleOrderBean orderBean) throws OrderException{
+		OrderPaymentSingleDO orderInfo = orderPaymentSingleDAO.getOrderinfoByOrderNoAndMerchNo(orderBean.getOrderId(), orderBean.getMerchNo());
+		if (orderInfo != null) {
+			if ("00".equals(orderInfo.getStatus())) {// 交易成功订单不可二次支付
+				throw new OrderException("OD001","订单交易成功，请不要重复支付");
+			}
+			if ("02".equals(orderInfo.getStatus())) {
+				throw new OrderException("OD002","订单正在支付中，请不要重复支付");
+			}
+			if ("04".equals(orderInfo.getStatus())) {
+				throw new OrderException("OD003","订单失效");
+			}
+			
+		}
+	}
+	/**
+	 * 检查订单二次支付
+	 * @param baseOrderBean
+	 * @return 受理订单号 tn
+	 * @throws OrderException
+	 */
+	public String checkOfPaymentSecondPay(ConcentrateSingleOrderBean orderBean) throws OrderException{
+		OrderPaymentSingleDO orderinfo = orderPaymentSingleDAO.getOrderinfoByOrderNoAndMerchNo(orderBean.getOrderId(), orderBean.getMerchNo());
+		if(orderinfo==null){
+			return null;
+		}
+		if(orderinfo.getTxnamt().longValue()!=Long.valueOf(orderBean.getTxnAmt()).longValue()){
+			logger.info("订单金额:{};数据库订单金额:{}", orderBean.getTxnAmt(),orderinfo.getTxnamt());
+			throw new OrderException("OD015");
+		}
+		
+		if(!orderinfo.getOrdercommitime().equals(orderBean.getTxnTime())){
+			logger.info("订单时间:{};数据库订单时间:{}", orderBean.getTxnTime(),orderinfo.getOrdercommitime());
+			throw new OrderException("OD016");
+		}
+		return orderinfo.getTn();
+	}
 	public String savePaymentOrder(ConcentrateSingleOrderBean orderBean) throws OrderException {
 		String txnseqno = serialNumberService.generateTxnseqno();
 		String TN = serialNumberService.generateTN(orderBean.getMerchNo());
@@ -315,11 +376,11 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 		orderPaymentSingle.setTxnsubtype(orderBean.getTxnSubType());
 		orderPaymentSingle.setBiztype(orderBean.getBizType());
 		orderPaymentSingle.setBackurl(orderBean.getBackUrl());
-		//orderCollectSingle.setMername(orderBean.getMerName());
-		//orderCollectSingle.setMerabbr(orderBean.getMerAbbr());
+		orderPaymentSingle.setMername(orderBean.getMerName());
+		orderPaymentSingle.setMerabbr(orderBean.getMerAbbr());
 		orderPaymentSingle.setOrderid(orderBean.getOrderId());
 		orderPaymentSingle.setTxntime(orderBean.getTxnTime());
-		//orderCollectSingle.setPaytimeout(orderBean.getPayTimeout());
+		orderPaymentSingle.setPaytimeout(orderBean.getPayTimeout());
 		orderPaymentSingle.setTxnamt(Long.valueOf(orderBean.getTxnAmt()));
 		orderPaymentSingle.setCurrencycode(orderBean.getCurrencyCode());
 		orderPaymentSingle.setDebtorbank(orderBean.getDebtorBank());
@@ -331,11 +392,290 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 		orderPaymentSingle.setCreditorname(orderBean.getCreditorName());
 		orderPaymentSingle.setProprietary(orderBean.getProprietary());
 		orderPaymentSingle.setSummary(orderBean.getSummary());
-		//orderCollectSingle.setOrderdesc(orderBean.getOrderDesc());
+		orderPaymentSingle.setOrderdesc(orderBean.getOrderDesc());
 		orderPaymentSingle.setReserved(orderBean.getReserved());
-		orderPaymentSingle.setStatus("01");
+		orderPaymentSingle.setStatus(OrderStatusEnum.INITIAL.value());
 		orderPaymentSingle.setOrdercommitime(orderBean.getTxnTime());
 		return orderPaymentSingle;
 	}
 
+
+	@Override
+	public String createBatchCollectionOrder(ConcentrateBatchOrderBean orderBean) throws OrderException {
+		checkOfBatchOrder(orderBean);
+		checkOfBatchRepeatSubmit(orderBean);
+		checkOfBatchBusiness(orderBean);
+		saveCollectionBatchOrder(orderBean);
+		
+		return null;
+	}
+	private void saveCollectionBatchOrder(ConcentrateBatchOrderBean orderBean) {
+		//保存批次订单数据
+		OrderCollectBatchDO orderCollectBatch = generateCollectBatchOrderBean(orderBean);
+		orderCollectBatch = orderCollectBatchDAO.saveCollectBatchOrder(orderCollectBatch);
+		//保存批次明细数据和交易流水
+		saveDetaOrder(orderCollectBatch.getTid(), orderBean);
+	}
+	
+	private void saveDetaOrder(long batchId,ConcentrateBatchOrderBean orderBean) {
+		//保存代收批次明细数据
+		List<ConcentrateOrderDetaBean> detaList = orderBean.getDetaList();
+		for(ConcentrateOrderDetaBean detaBean : detaList){
+			String txnseqno = serialNumberService.generateTxnseqno();
+			OrderCollectDetaDO orderCollectDeta = new OrderCollectDetaDO();
+			orderCollectDeta.setBatchtid(batchId);
+			orderCollectDeta.setBatchno(orderBean.getBatchNo());
+			orderCollectDeta.setOrderid(detaBean.getOrderId());
+			orderCollectDeta.setCurrencycode(detaBean.getCurrencyCode());
+			orderCollectDeta.setAmt(detaBean.getAmt());
+			orderCollectDeta.setDebtorbank(detaBean.getDebtorBank());
+			orderCollectDeta.setDebtoraccount(detaBean.getDebtorAccount());
+			orderCollectDeta.setDebtorname(detaBean.getDebtorName());
+			orderCollectDeta.setDebtorconsign(detaBean.getDebtorConsign());
+			orderCollectDeta.setCreditorbank(detaBean.getCreditorBank());
+			orderCollectDeta.setCreditoraccount(detaBean.getCreditorAccount());
+			orderCollectDeta.setCreditorname(detaBean.getCreditorName());
+			orderCollectDeta.setProprietary(detaBean.getProprietary());
+			orderCollectDeta.setSummary(detaBean.getSummary());
+			orderCollectDeta.setRelatetradetxn(txnseqno);
+			orderCollectDeta.setStatus(OrderStatusEnum.INITIAL.value());
+			
+			PojoTxnsLog txnsLog = new PojoTxnsLog();
+			MerchantBean member = null;
+			PojoTxncodeDef busiModel = txncodeDefDAO.getBusiCode(orderBean.getTxnType(), orderBean.getTxnSubType(),orderBean.getBizType());
+			member = merchService.getMerchBymemberId(orderBean.getMerId());
+			txnsLog.setRiskver(member.getRiskVer());
+			txnsLog.setSplitver(member.getSpiltVer());
+			txnsLog.setFeever(member.getFeeVer());
+			txnsLog.setPrdtver(member.getPrdtVer());
+			txnsLog.setRoutver(member.getRoutVer());
+			txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlCycle().toString())));
+			txnsLog.setTxndate(DateUtil.getCurrentDate());
+			txnsLog.setTxntime(DateUtil.getCurrentTime());
+			txnsLog.setBusicode(busiModel.getBusicode());
+			txnsLog.setBusitype(busiModel.getBusitype());
+			txnsLog.setTradcomm(0L);
+			txnsLog.setAmount(Long.valueOf(detaBean.getAmt()));
+			txnsLog.setAccordno(detaBean.getOrderId());
+			txnsLog.setAccfirmerno(orderBean.getCoopinstiId());
+			txnsLog.setAcccoopinstino(orderBean.getCoopinstiId());
+			txnsLog.setAccsecmerno(orderBean.getMerId());
+			txnsLog.setAccordcommitime(DateUtil.getCurrentDateTime());
+			txnsLog.setTradestatflag(TradeStatFlagEnum.INITIAL.getStatus());// 交易初始状态
+			txnsLog.setAccmemberid("999999999999999");// 匿名会员号
+			commonOrderService.saveTxnsLog(txnsLog);
+			orderCollectDetaDAO.saveCollectOrderDeta(orderCollectDeta);
+			
+		}
+		
+		
+	}
+
+
+	private OrderCollectBatchDO generateCollectBatchOrderBean(
+			ConcentrateBatchOrderBean orderBean) {
+		OrderCollectBatchDO orderCollectBatchDO = new OrderCollectBatchDO();
+		orderCollectBatchDO.setVersion(orderBean.getVersion());
+		orderCollectBatchDO.setAccesstype(orderBean.getAccessType());
+		orderCollectBatchDO.setCoopinstiid(orderBean.getCoopinstiId());
+		orderCollectBatchDO.setMerid(orderBean.getMerId());
+		orderCollectBatchDO.setEncoding(orderBean.getEncoding());
+		orderCollectBatchDO.setTxntype(orderBean.getTxnType());
+		orderCollectBatchDO.setTxnsubtype(orderBean.getTxnSubType());
+		orderCollectBatchDO.setBackurl(orderBean.getBackUrl());
+		orderCollectBatchDO.setBatchno(orderBean.getBatchNo());
+		orderCollectBatchDO.setTxndate(orderBean.getTxnTime().substring(0,8));
+		orderCollectBatchDO.setTxntime(orderBean.getTxnTime().substring(8));
+		orderCollectBatchDO.setTotalqty(Long.valueOf(orderBean.getTotalQty()));
+		orderCollectBatchDO.setTotalamt(Long.valueOf(orderBean.getTotalAmt()));
+		orderCollectBatchDO.setReserved(orderBean.getReserved());
+		orderCollectBatchDO.setStatus(OrderStatusEnum.INITIAL.value());
+		orderCollectBatchDO.setOrdercommitime(DateUtil.getCurrentDateTime());
+		return orderCollectBatchDO;
+	}
+	
+	
+	
+
+
+	/**
+	 * 检查订单业务有效性
+	 * @param orderBean
+	 * @throws OrderException
+	 */
+	public void checkOfBatchBusiness(ConcentrateBatchOrderBean orderBean) throws OrderException {
+		PojoTxncodeDef busiModel = txncodeDefDAO.getBusiCode(orderBean.getTxnType(), orderBean.getTxnSubType(), orderBean.getBizType());
+        if(busiModel==null){
+        	throw new OrderException("OD045");
+        }
+        BusiTypeEnum busiTypeEnum = BusiTypeEnum.fromValue(busiModel.getBusitype());
+        if(busiTypeEnum==BusiTypeEnum.CONCENTRATE){//集中代收付业务
+        	if(StringUtils.isEmpty(orderBean.getMerId())){
+        		 throw new OrderException("OD004");
+        	}
+        	MerchantBean member = merchService.getMerchBymemberId(orderBean.getMerId());//memberService.getMemberByMemberId(order.getMerId());.java
+        	if(member==null){
+        		throw new OrderException("OD009");
+        	}
+        	PojoProdCase prodCase= prodCaseDAO.getMerchProd(member.getPrdtVer(),busiModel.getBusicode());
+            if(prodCase==null){
+                throw new OrderException("OD005");
+            }
+        }else{
+            throw new OrderException("OD045");
+        }
+	}
+	private void checkOfBatchRepeatSubmit(ConcentrateBatchOrderBean orderBean) throws OrderException {
+		// TODO Auto-generated method stub
+		OrderCollectBatchDO orderInfo = orderCollectBatchDAO.getCollectBatchOrder(orderBean.getMerId(), orderBean.getBatchNo(), orderBean.getTxnTime().substring(0, 8));
+		if (orderInfo != null) {
+			if ("00".equals(orderInfo.getStatus())) {// 交易成功订单不可二次支付
+				throw new OrderException("OD001","订单交易成功，请不要重复支付");
+			}
+			if ("02".equals(orderInfo.getStatus())) {
+				throw new OrderException("OD002","订单正在支付中，请不要重复支付");
+			}
+			if ("04".equals(orderInfo.getStatus())) {
+				throw new OrderException("OD003","订单失效");
+			}
+			
+		}
+	}
+
+
+	/**
+	 * 检查代收批次数据和明细数据
+	 * @param orderBean
+	 * @throws OrderException
+	 */
+	public void checkOfBatchOrder(ConcentrateBatchOrderBean orderBean) throws OrderException{
+		ResultBean resultBean = null;
+		resultBean = ValidateLocator.validateBeans(orderBean);
+		if(!resultBean.isResultBool()){
+			throw new OrderException("OD049", resultBean.getErrMsg());
+		}
+		int size = orderBean.getDetaList().size();
+		if(size>0){
+			List<ConcentrateOrderDetaBean> detaList = orderBean.getDetaList();
+			for(ConcentrateOrderDetaBean detaBean : detaList){
+				resultBean = ValidateLocator.validateBeans(detaBean);
+				if(!resultBean.isResultBool()){
+					throw new OrderException("OD049", resultBean.getErrMsg());
+				}
+			}
+		}else{
+			throw new OrderException("");
+		}
+	}
+
+
+	@Override
+	public String createBatchPaymentOrder(ConcentrateBatchOrderBean orderBean) throws OrderException {
+		checkOfBatchOrder(orderBean);
+		checkOfPaymentBatchRepeatSubmit(orderBean);
+		checkOfBatchBusiness(orderBean);
+		savePaymentBatchOrder(orderBean);
+		return null;
+	}
+
+	private void checkOfPaymentBatchRepeatSubmit(
+			ConcentrateBatchOrderBean orderBean) throws OrderException {
+		OrderPaymentBatchDO orderInfo = orderPaymentBatchDAO.getCollectBatchOrder(orderBean.getMerId(), orderBean.getBatchNo(), orderBean.getTxnTime().substring(0, 8));
+		if (orderInfo != null) {
+			if ("00".equals(orderInfo.getStatus())) {// 交易成功订单不可二次支付
+				throw new OrderException("OD001","订单交易成功，请不要重复支付");
+			}
+			if ("02".equals(orderInfo.getStatus())) {
+				throw new OrderException("OD002","订单正在支付中，请不要重复支付");
+			}
+			if ("04".equals(orderInfo.getStatus())) {
+				throw new OrderException("OD003","订单失效");
+			}
+			
+		}
+		
+	}
+	private void savePaymentBatchOrder(ConcentrateBatchOrderBean orderBean) {
+		//保存批次订单数据
+		OrderPaymentBatchDO orderPaymentBatch = generatePaymentBatchOrderBean(orderBean);
+		orderPaymentBatch = orderPaymentBatchDAO.savePaymentBatchOrder(orderPaymentBatch);
+		//保存批次明细数据和交易流水
+		savePaymentDetaOrder(orderPaymentBatch.getTid(), orderBean);
+	}
+	
+	private void savePaymentDetaOrder(long batchId,ConcentrateBatchOrderBean orderBean) {
+		//保存代收批次明细数据
+		List<ConcentrateOrderDetaBean> detaList = orderBean.getDetaList();
+		for(ConcentrateOrderDetaBean detaBean : detaList){
+			String txnseqno = serialNumberService.generateTxnseqno();
+			OrderPaymentDetaDO orderPaymentDeta = new OrderPaymentDetaDO();
+			orderPaymentDeta.setBatchtid(batchId);
+			orderPaymentDeta.setBatchno(orderBean.getBatchNo());
+			orderPaymentDeta.setOrderid(detaBean.getOrderId());
+			orderPaymentDeta.setCurrencycode(detaBean.getCurrencyCode());
+			orderPaymentDeta.setAmt(detaBean.getAmt());
+			orderPaymentDeta.setDebtorbank(detaBean.getDebtorBank());
+			orderPaymentDeta.setDebtoraccount(detaBean.getDebtorAccount());
+			orderPaymentDeta.setDebtorname(detaBean.getDebtorName());
+			orderPaymentDeta.setDebtorconsign(detaBean.getDebtorConsign());
+			orderPaymentDeta.setCreditorbank(detaBean.getCreditorBank());
+			orderPaymentDeta.setCreditoraccount(detaBean.getCreditorAccount());
+			orderPaymentDeta.setCreditorname(detaBean.getCreditorName());
+			orderPaymentDeta.setProprietary(detaBean.getProprietary());
+			orderPaymentDeta.setSummary(detaBean.getSummary());
+			orderPaymentDeta.setRelatetradetxn(txnseqno);
+			orderPaymentDeta.setStatus(OrderStatusEnum.INITIAL.value());
+			
+			PojoTxnsLog txnsLog = new PojoTxnsLog();
+			MerchantBean member = null;
+			PojoTxncodeDef busiModel = txncodeDefDAO.getBusiCode(orderBean.getTxnType(), orderBean.getTxnSubType(),orderBean.getBizType());
+			member = merchService.getMerchBymemberId(orderBean.getMerId());
+			txnsLog.setRiskver(member.getRiskVer());
+			txnsLog.setSplitver(member.getSpiltVer());
+			txnsLog.setFeever(member.getFeeVer());
+			txnsLog.setPrdtver(member.getPrdtVer());
+			txnsLog.setRoutver(member.getRoutVer());
+			txnsLog.setAccsettledate(DateUtil.getSettleDate(Integer.valueOf(member.getSetlCycle().toString())));
+			txnsLog.setTxndate(DateUtil.getCurrentDate());
+			txnsLog.setTxntime(DateUtil.getCurrentTime());
+			txnsLog.setBusicode(busiModel.getBusicode());
+			txnsLog.setBusitype(busiModel.getBusitype());
+			txnsLog.setTradcomm(0L);
+			txnsLog.setAmount(Long.valueOf(detaBean.getAmt()));
+			txnsLog.setAccordno(detaBean.getOrderId());
+			txnsLog.setAccfirmerno(orderBean.getCoopinstiId());
+			txnsLog.setAcccoopinstino(orderBean.getCoopinstiId());
+			txnsLog.setAccsecmerno(orderBean.getMerId());
+			txnsLog.setAccordcommitime(DateUtil.getCurrentDateTime());
+			txnsLog.setTradestatflag(TradeStatFlagEnum.INITIAL.getStatus());// 交易初始状态
+			txnsLog.setAccmemberid("999999999999999");// 匿名会员号
+			commonOrderService.saveTxnsLog(txnsLog);
+			orderPaymentDetaDAO.savePaymentDetaOrder(orderPaymentDeta);
+			
+		}
+		
+		
+	}
+
+	private OrderPaymentBatchDO generatePaymentBatchOrderBean(
+			ConcentrateBatchOrderBean orderBean) {
+		OrderPaymentBatchDO orderPaymentSingle = new OrderPaymentBatchDO();
+		orderPaymentSingle.setVersion(orderBean.getVersion());
+		orderPaymentSingle.setAccesstype(orderBean.getAccessType());
+		orderPaymentSingle.setCoopinstiid(orderBean.getCoopinstiId());
+		orderPaymentSingle.setMerid(orderBean.getMerId());
+		orderPaymentSingle.setEncoding(orderBean.getEncoding());
+		orderPaymentSingle.setTxntype(orderBean.getTxnType());
+		orderPaymentSingle.setTxnsubtype(orderBean.getTxnSubType());
+		orderPaymentSingle.setBackurl(orderBean.getBackUrl());
+		orderPaymentSingle.setBatchno(orderBean.getBatchNo());
+		orderPaymentSingle.setTxntime(orderBean.getTxnTime());
+		
+		orderPaymentSingle.setTotalqty(Long.valueOf(orderBean.getTotalQty()));
+		orderPaymentSingle.setTotalamt(Long.valueOf(orderBean.getTotalAmt()));
+		orderPaymentSingle.setReserved(orderBean.getReserved());
+		orderPaymentSingle.setStatus(OrderStatusEnum.INITIAL.value());
+		orderPaymentSingle.setOrdercommitime(DateUtil.getCurrentDateTime());
+		return orderPaymentSingle;
+	}
 }

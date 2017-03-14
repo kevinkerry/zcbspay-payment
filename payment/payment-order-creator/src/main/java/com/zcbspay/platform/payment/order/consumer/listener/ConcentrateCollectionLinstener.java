@@ -29,8 +29,8 @@ import com.zcbspay.platform.payment.order.service.concentrate.ConcentrateOrderSe
  * @date 2017年3月13日 上午11:30:53
  * @since
  */
-@Service("concentratePaymentLinstener")
-public class ConcentratePaymentLinstener implements MessageListenerConcurrently{
+@Service("concentrateCollectionLinstener")
+public class ConcentrateCollectionLinstener implements MessageListenerConcurrently{
 	private static final Logger log = LoggerFactory.getLogger(InsteadPayOrderListener.class);
 	private static final ResourceBundle RESOURCE = ResourceBundle.getBundle("consumer_order");
 	private static final String KEY = "CONCENTRATECOLLECTIONORDER:";
@@ -44,9 +44,9 @@ public class ConcentratePaymentLinstener implements MessageListenerConcurrently{
 	public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs,
 			ConsumeConcurrentlyContext context) {
 		for (MessageExt msg : msgs) {
-			if (msg.getTopic().equals(RESOURCE.getString("concentrate.payment.order.subscribe"))) {
+			if (msg.getTopic().equals(RESOURCE.getString("concentrate.collection.order.subscribe"))) {
 				OrderTagsEnum orderTagsEnum = OrderTagsEnum.fromValue(msg.getTags());
-				if(orderTagsEnum==OrderTagsEnum.CONCENTRATE_PAYMENT_REALTIME) {//实时代付
+				if(orderTagsEnum==OrderTagsEnum.CONCENTRATE_COLLECTION_CHARGES_REALTIME) {//实时代付
 						String json = new String(msg.getBody(), Charsets.UTF_8);
 						log.info("接收到的MSG:{}", json);
 						log.info("接收到的MSGID:{}", msg.getMsgId());
@@ -67,7 +67,7 @@ public class ConcentratePaymentLinstener implements MessageListenerConcurrently{
 						}
 						orderCacheResultService.saveConsumeOrderOfTN(KEY
 								+ msg.getMsgId(), JSON.toJSONString(resultBean));
-				}else if(orderTagsEnum==OrderTagsEnum.CONCENTRATE_PAYMENT_BATCH){//批量代付订单处理
+				}else if(orderTagsEnum==OrderTagsEnum.CONCENTRATE_COLLECTION_CHARGES_BATCH){//批量代付订单处理
 					String json = new String(msg.getBody(), Charsets.UTF_8);
 					log.info("接收到的MSG:{}", json);
 					log.info("接收到的MSGID:{}", msg.getMsgId());
@@ -80,7 +80,7 @@ public class ConcentratePaymentLinstener implements MessageListenerConcurrently{
 					}
 					ResultBean resultBean = null;
 					try {
-						String tn = concentrateOrderService.createBatchPaymentOrder(orderBean);
+						String tn = concentrateOrderService.createBatchCollectionOrder(orderBean);
 						resultBean = new ResultBean(tn);
 					}catch (Throwable e) {
 						e.printStackTrace();

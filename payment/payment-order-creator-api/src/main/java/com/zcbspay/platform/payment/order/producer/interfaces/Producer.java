@@ -27,28 +27,6 @@ import com.zcbspay.platform.payment.order.producer.enums.OrderTagsEnum;
  * @since 
  */
 public interface Producer {
-
-	/**
-	 * 生产者发送信息
-	 * @param message
-	 * @param tags
-	 * @param sendCallback
-	 * @throws MQClientException
-	 * @throws RemotingException
-	 * @throws InterruptedException
-	 */
-	public void sendMessage(Object message,OrderTagsEnum tags,SendCallback sendCallback)throws MQClientException, RemotingException, InterruptedException;
-	
-	/**
-	 * 生产者发送JSON信息
-	 * @param message
-	 * @param tags
-	 * @param sendCallback
-	 * @throws MQClientException
-	 * @throws RemotingException
-	 * @throws InterruptedException
-	 */
-	public void sendJsonMessage(String message,OrderTagsEnum tags,SendCallback sendCallback)throws MQClientException, RemotingException, InterruptedException;
 	
 	/**
 	 * 生产者发送JSON信息

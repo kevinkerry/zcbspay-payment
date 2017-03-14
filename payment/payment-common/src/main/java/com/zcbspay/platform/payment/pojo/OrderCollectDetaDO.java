@@ -1,4 +1,4 @@
-package com.zcbspay.platform.payment.order.dao.pojo;
+package com.zcbspay.platform.payment.pojo;
 // default package
 // Generated 2017-3-13 14:30:06 by Hibernate Tools 3.4.0.CR1
 

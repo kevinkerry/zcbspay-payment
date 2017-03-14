@@ -1,8 +1,7 @@
 package com.zcbspay.platform.payment.concentrate;
 
 import com.zcbspay.platform.payment.bean.ResultBean;
-import com.zcbspay.platform.payment.concentrate.bean.RealTimeCollectionChargesBean;
-import com.zcbspay.platform.payment.concentrate.bean.RealTimepaymentByAgencyBean;
+import com.zcbspay.platform.payment.exception.ConcentrateTradeException;
 
 /**
  * 集中代收付实时交易接口
@@ -18,13 +17,15 @@ public interface RealTimeTrade {
 	 * 实时代收交易接口
 	 * @param realTimeCollectionVChargesBean
 	 * @return
+	 * @throws ConcentrateTradeException 
 	 */
-	public ResultBean collectionCharges(RealTimeCollectionChargesBean realTimeCollectionVChargesBean);
+	public ResultBean collectionCharges(String tn) throws ConcentrateTradeException;
 	
 	/**
-	 * 实时代付交易接 口
+	 * 实时代付交易接口
 	 * @param realTimepaymentByAgencyBean
 	 * @return
+	 * @throws ConcentrateTradeException 
 	 */
-	public ResultBean paymentByAgency(RealTimepaymentByAgencyBean realTimepaymentByAgencyBean);
+	public ResultBean paymentByAgency(String tn) throws ConcentrateTradeException;
 }

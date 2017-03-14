@@ -1,7 +1,7 @@
-package com.zcbspay.platform.payment.order.dao;
+package com.zcbspay.platform.payment.dao;
 
 import com.zcbspay.platform.payment.commons.dao.BaseDAO;
-import com.zcbspay.platform.payment.order.dao.pojo.OrderCollectSingleDO;
+import com.zcbspay.platform.payment.pojo.OrderCollectSingleDO;
 
 public interface OrderCollectSingleDAO extends BaseDAO<OrderCollectSingleDO>{
 
@@ -18,4 +18,17 @@ public interface OrderCollectSingleDAO extends BaseDAO<OrderCollectSingleDO>{
 	 * @param orderCollectSingle
 	 */
 	public void saveSingleCollectOrder(OrderCollectSingleDO orderCollectSingle);
+	
+	/**
+	 * 通过tn获取代收订单信息
+	 * @param tn
+	 * @return
+	 */
+	public OrderCollectSingleDO getOrderinfoByTn(String tn);
+	
+	/**
+	 * 更新订单状态为开始支付
+	 * @param tn
+	 */
+	public void updateOrderToStartPay(String tn);
 }

@@ -72,44 +72,7 @@ public class SimpleOrderSpringProducer implements Producer{
 	
 	
 	 
-	/**
-	 *
-	 * @param message
-	 * @throws InterruptedException 
-	 * @throws RemotingException 
-	 * @throws MQClientException 
-	 */
-	@Override
-	public void sendMessage(Object message,OrderTagsEnum tags,SendCallback sendCallback) throws MQClientException, RemotingException, InterruptedException {
-		if(producer==null){
-			throw new MQClientException(-1,"未创建SimpleOrderProducer");
-		}
-		
-		Message msg = new Message(topic, tags.getCode(), JSON.toJSONString(message).getBytes(Charsets.UTF_8));
-		producer.send(msg,sendCallback);
-	}
-
-
-
-	/**
-	 *
-	 * @param message
-	 * @param tags
-	 * @throws MQClientException
-	 * @throws RemotingException
-	 * @throws InterruptedException
-	 */
-	@Override
-	public void sendJsonMessage(String message, OrderTagsEnum tags,SendCallback sendCallback)
-			throws MQClientException, RemotingException, InterruptedException {
-		if(producer==null){
-			throw new MQClientException(-1,"SimpleOrderProducer为空");
-		}
-		Message msg = new Message(topic, tags.getCode(), message.getBytes(Charsets.UTF_8));
-		producer.send(msg,sendCallback);
-	}
-
-
+	
 
 	/**
 	 *

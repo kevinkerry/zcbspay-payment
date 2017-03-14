@@ -44,7 +44,14 @@
             destroy-method="closeProducer"
             scope="singleton"/>
             
-    
+    <bean id="concentrateCollectionOrderProducer" class="com.zcbspay.platform.payment.order.producer.spring.ConcentrateCollectionOrderSpringProducer"
+            init-method="init"  
+            destroy-method="closeProducer"
+            scope="singleton"/>
+	<bean id="concentratePaymentOrderProducer" class="com.zcbspay.platform.payment.order.producer.spring.ConcentratePaymentOrderSpringProducer"
+            init-method="init"  
+            destroy-method="closeProducer"
+            scope="singleton"/>
 	<import resource="classpath:/spring-hibernate.xml"/>
 	<import resource="classpath:/spring-dubbo.xml"/>
 </beans>
