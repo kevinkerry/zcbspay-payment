@@ -39,7 +39,7 @@ public class ConcentrateCollectionOrderSpringProducer implements Producer{
 			namesrvAddr = RESOURCE.getString("single.namesrv.addr");
 		}
 		logger.info("【namesrvAddr】"+namesrvAddr);          
-		producer = new DefaultMQProducer(RESOURCE.getString("concentrate.collection.order.consumer.group"));
+		producer = new DefaultMQProducer(RESOURCE.getString("concentrate.collection.order.producer.group"));
 		producer.setNamesrvAddr(namesrvAddr);
 		Random random = new Random();
         producer.setInstanceName(RESOURCE.getString("concentrate.collection.order.instancename")+random.nextInt(9999));

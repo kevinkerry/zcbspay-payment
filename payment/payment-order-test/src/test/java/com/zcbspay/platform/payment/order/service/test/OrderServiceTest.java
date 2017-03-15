@@ -3,12 +3,13 @@ package com.zcbspay.platform.payment.order.service.test;
 import org.junit.Test;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.alibaba.fastjson.JSON;
-import com.zcbspay.platform.member.merchant.bean.MerchantBean;
 import com.zcbspay.platform.member.merchant.service.MerchService;
 import com.zcbspay.platform.payment.exception.PaymentOrderException;
 import com.zcbspay.platform.payment.order.bean.InsteadPayOrderBean;
+import com.zcbspay.platform.payment.order.bean.RealTimeCollectionChargesBean;
+import com.zcbspay.platform.payment.order.bean.RealTimepaymentByAgencyBean;
 import com.zcbspay.platform.payment.order.bean.SimpleOrderBean;
+import com.zcbspay.platform.payment.order.service.ConcentrateOrderService;
 import com.zcbspay.platform.payment.order.service.OrderService;
 import com.zcbspay.platform.payment.utils.DateUtil;
 
@@ -19,15 +20,89 @@ public class OrderServiceTest extends BaseTest{
 	private OrderService orderService;
 	@Reference(version="1.0")
 	public MerchService merchService;
-	
+	@Reference(version="1.0")
+	public ConcentrateOrderService concentrateOrderService;
 	@Test
 	public void testAll() throws PaymentOrderException{
 		long currentTime = System.currentTimeMillis();
 		//消费订单
-		test_consume_order();
+		//test_consume_order();
 		//代付订单
 		//test_insteadPay_order();
+		//集中代收
+		test_collect_order();
+		//集中代付
+		//test_payment_order();
+		
 		System.out.println("excute time:"+(System.currentTimeMillis()-currentTime));
+	}
+	
+	public void test_payment_order(){
+		try {
+			RealTimepaymentByAgencyBean realTimepaymentByAgencyBean = new RealTimepaymentByAgencyBean();
+			realTimepaymentByAgencyBean.setVersion("1.0");
+			realTimepaymentByAgencyBean.setEncoding("1");
+			realTimepaymentByAgencyBean.setTxnType("02");
+			realTimepaymentByAgencyBean.setTxnSubType("00");
+			realTimepaymentByAgencyBean.setBizType("000002");
+			realTimepaymentByAgencyBean.setBackUrl("");
+			realTimepaymentByAgencyBean.setMerchNo("200000000000610");
+			realTimepaymentByAgencyBean.setMerAbbr("");
+			realTimepaymentByAgencyBean.setOrderId(System.currentTimeMillis()+"");
+			realTimepaymentByAgencyBean.setTxnTime(DateUtil.getCurrentDateTime());
+			realTimepaymentByAgencyBean.setPayTimeout("20180202000000");
+			realTimepaymentByAgencyBean.setTxnAmt("12");
+			realTimepaymentByAgencyBean.setCurrencyCode("156");
+			realTimepaymentByAgencyBean.setOrderDesc("集中代收实时测试");
+			realTimepaymentByAgencyBean.setDebtorBank("203121000010");
+			realTimepaymentByAgencyBean.setDebtorAccount("6228480018543668979");
+			realTimepaymentByAgencyBean.setDebtorName("测试账户1");
+			realTimepaymentByAgencyBean.setDebtorConsign("1234567");
+			realTimepaymentByAgencyBean.setCreditorBank("203121000010");
+			realTimepaymentByAgencyBean.setCreditorAccount("6228480018543668970");
+			realTimepaymentByAgencyBean.setCreditorName("测试账户2");
+			realTimepaymentByAgencyBean.setProprietary("09001");
+			String tn = concentrateOrderService.createPaymentByAgencyOrder(realTimepaymentByAgencyBean );
+			System.out.println("createCollectionChargesOrder TN:"+tn);
+		} catch (PaymentOrderException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void test_collect_order(){
+		RealTimeCollectionChargesBean realTimeCollectionChargesBean = new RealTimeCollectionChargesBean();
+		realTimeCollectionChargesBean.setVersion("1.0");
+		realTimeCollectionChargesBean.setEncoding("1");
+		realTimeCollectionChargesBean.setTxnType("01");
+		realTimeCollectionChargesBean.setTxnSubType("00");
+		realTimeCollectionChargesBean.setBizType("000002");
+		realTimeCollectionChargesBean.setBackUrl("");
+		realTimeCollectionChargesBean.setMerchNo("200000000000610");
+		realTimeCollectionChargesBean.setMerName("");
+		realTimeCollectionChargesBean.setMerAbbr("");
+		realTimeCollectionChargesBean.setOrderId(System.currentTimeMillis()+"");
+		realTimeCollectionChargesBean.setTxnTime(DateUtil.getCurrentDateTime());
+		realTimeCollectionChargesBean.setPayTimeout("20180202000000");
+		realTimeCollectionChargesBean.setTxnAmt("12");
+		realTimeCollectionChargesBean.setCurrencyCode("156");
+		realTimeCollectionChargesBean.setOrderDesc("集中代收实时测试");
+		realTimeCollectionChargesBean.setDebtorBank("203121000010");
+		realTimeCollectionChargesBean.setDebtorAccount("6228480018543668979");
+		realTimeCollectionChargesBean.setDebtorName("测试账户1");
+		realTimeCollectionChargesBean.setDebtorConsign("1234567");
+		realTimeCollectionChargesBean.setCreditorBank("203121000010");
+		realTimeCollectionChargesBean.setCreditorAccount("6228480018543668970");
+		realTimeCollectionChargesBean.setCreditorName("测试账户2");
+		realTimeCollectionChargesBean.setProprietary("09001");
+		
+		try {
+			String tn = concentrateOrderService.createCollectionChargesOrder(realTimeCollectionChargesBean);
+			System.out.println("createCollectionChargesOrder TN:"+tn);
+		} catch (PaymentOrderException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	

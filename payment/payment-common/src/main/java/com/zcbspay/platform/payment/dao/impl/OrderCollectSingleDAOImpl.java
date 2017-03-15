@@ -43,6 +43,7 @@ public class OrderCollectSingleDAOImpl extends HibernateBaseDAOImpl<OrderCollect
 	}
 
 	@Override
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
 	public void updateOrderToStartPay(String tn) {
 		// TODO Auto-generated method stub
 		Session session = getSession();

@@ -1,6 +1,6 @@
 package com.zcbspay.platform.payment.pojo;
 // default package
-// Generated 2017-3-13 14:30:06 by Hibernate Tools 3.4.0.CR1
+// Generated 2017-3-15 11:45:47 by Hibernate Tools 3.4.0.CR1
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,10 +18,6 @@ import javax.persistence.Version;
 @Table(name = "T_ORDER_COLLECT_SINGLE")
 public class OrderCollectSingleDO implements java.io.Serializable {
 
-	/**
-	 * serialVersionUID
-	 */
-	private static final long serialVersionUID = 7139504631924903328L;
 	private long tid;
 	private String version;
 	private String accesstype;
@@ -128,7 +124,7 @@ public class OrderCollectSingleDO implements java.io.Serializable {
 		this.tid = tid;
 	}
 
-	@Version
+	
 	@Column(name = "VERSION", length = 6)
 	public String getVersion() {
 		return this.version;

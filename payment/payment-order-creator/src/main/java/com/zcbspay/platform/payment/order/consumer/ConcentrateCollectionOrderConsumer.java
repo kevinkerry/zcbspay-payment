@@ -31,8 +31,8 @@ public class ConcentrateCollectionOrderConsumer  implements  ApplicationListener
 	private static final Logger log = LoggerFactory.getLogger(InsteadPayOrderConsumer.class);
 	private static final  ResourceBundle RESOURCE = ResourceBundle.getBundle("consumer_order");
 	
-	@Autowired
-	@Qualifier("concentrateCollectionListener")
+	@Autowired  
+	@Qualifier("concentrateCollectionLinstener")
 	private MessageListenerConcurrently concentrateCollectionListener;
 	
 	public void startConsume() throws InterruptedException, MQClientException {
@@ -40,7 +40,7 @@ public class ConcentrateCollectionOrderConsumer  implements  ApplicationListener
 		 * 当前例子是PushConsumer用法，使用方式给用户感觉是消息从RocketMQ服务器推到了应用客户端。<br>
 		 * 但是实际PushConsumer内部是使用长轮询Pull方式从RocketMQ服务器拉消息，然后再回调用户Listener方法<br>
 		 */
-		DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(RESOURCE.getString("concentrate.order.consumer.group"));
+		DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(RESOURCE.getString("concentrate.collection.order.consumer.group"));
 		consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
 		consumer.setNamesrvAddr(RESOURCE.getString("single.namesrv.addr"));
 		consumer.setInstanceName(RESOURCE.getString("concentrate.collection.order.instancename"));

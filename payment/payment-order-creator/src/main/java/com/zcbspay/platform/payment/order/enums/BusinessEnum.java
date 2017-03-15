@@ -44,8 +44,8 @@ public enum BusinessEnum {
     REFUND_ACCOUNT("40000002"),//退款-账户
     CHARGE_OFFLINE("90000001"),//手工充值
     
-    CONSUMEQUICK_PRODUCT("11000001"),//产品-消费-快捷
-    CONSUMEACCOUNT_PRODUCT("11000002"),//产品-消费-账户
+    //CONSUMEQUICK_PRODUCT("11000001"),//产品-消费-快捷
+    //CONSUMEACCOUNT_PRODUCT("11000002"),//产品-消费-账户
     
     TRANSFER("50000001"),//转账
     BAIL_WITHDRAWALS("50000002"),//保证金线提取
@@ -56,6 +56,9 @@ public enum BusinessEnum {
     TRANSFER_INDUSTRY("50000003"),//转账-行业
     EXTRACT_INDUSTRY("50000004"),//提取-行业
     REFUND_INDUSTRY("40000005"),//退款-行业
+    
+    CONCENTRATE_COLLECT_REALTIME("11000001"),
+    CONCENTRATE_PAYMENT_REALTIME("11000002"),
     UNKNOW("");//未知
     private String busiCode;
     

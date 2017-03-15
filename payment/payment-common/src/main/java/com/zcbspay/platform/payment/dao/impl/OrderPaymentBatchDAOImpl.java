@@ -2,6 +2,7 @@ package com.zcbspay.platform.payment.dao.impl;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,7 +10,7 @@ import com.zcbspay.platform.payment.commons.dao.impl.HibernateBaseDAOImpl;
 import com.zcbspay.platform.payment.dao.OrderPaymentBatchDAO;
 import com.zcbspay.platform.payment.pojo.OrderCollectBatchDO;
 import com.zcbspay.platform.payment.pojo.OrderPaymentBatchDO;
-
+@Repository
 public class OrderPaymentBatchDAOImpl extends HibernateBaseDAOImpl<OrderPaymentBatchDO> implements
 		OrderPaymentBatchDAO {
 

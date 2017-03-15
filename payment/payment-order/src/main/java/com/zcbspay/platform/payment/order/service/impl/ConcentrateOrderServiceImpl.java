@@ -20,7 +20,7 @@ import com.zcbspay.platform.payment.order.producer.enums.OrderTagsEnum;
 import com.zcbspay.platform.payment.order.producer.interfaces.Producer;
 import com.zcbspay.platform.payment.order.service.ConcentrateOrderService;
 
-@Service
+@Service("concentrateOrderService")
 public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 
 	private static final Logger logger = LoggerFactory.getLogger(ConcentrateOrderServiceImpl.class);

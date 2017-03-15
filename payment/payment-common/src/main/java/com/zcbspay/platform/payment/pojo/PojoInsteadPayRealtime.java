@@ -121,9 +121,9 @@ public class PojoInsteadPayRealtime implements java.io.Serializable {
 		this.remarks = remarks;
 	}
 
-	 @Id
-	 @GeneratedValue(strategy=GenerationType.SEQUENCE,generator="seq_instead_pay_realtime") 
-	 @SequenceGenerator(name="seq_instead_pay_realtime",sequenceName="SEQ_INSTEAD_PAY_REALTIME",allocationSize=1)
+	@Id
+	@GeneratedValue(strategy=GenerationType.SEQUENCE,generator="seq_instead_pay_realtime") 
+	@SequenceGenerator(name="seq_instead_pay_realtime",sequenceName="SEQ_INSTEAD_PAY_REALTIME",allocationSize=1)
 	@Column(name = "ID", unique = true, nullable = false, scale = 0)
 	public Long getId() {
 		return this.id;

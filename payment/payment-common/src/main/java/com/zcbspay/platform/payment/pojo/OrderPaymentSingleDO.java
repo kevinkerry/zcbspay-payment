@@ -1,10 +1,13 @@
 package com.zcbspay.platform.payment.pojo;
 // default package
-// Generated 2017-3-13 14:30:06 by Hibernate Tools 3.4.0.CR1
+// Generated 2017-3-15 11:45:47 by Hibernate Tools 3.4.0.CR1
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
@@ -15,10 +18,6 @@ import javax.persistence.Version;
 @Table(name = "T_ORDER_PAYMENT_SINGLE")
 public class OrderPaymentSingleDO implements java.io.Serializable {
 
-	/**
-	 * serialVersionUID
-	 */
-	private static final long serialVersionUID = 6444094189419139974L;
 	private long tid;
 	private String version;
 	private String accesstype;
@@ -45,6 +44,7 @@ public class OrderPaymentSingleDO implements java.io.Serializable {
 	private String creditorname;
 	private String proprietary;
 	private String summary;
+	private String orderdesc;
 	private String reserved;
 	private String respcode;
 	private String respmsg;
@@ -55,8 +55,7 @@ public class OrderPaymentSingleDO implements java.io.Serializable {
 	private String syncnotify;
 	private String notes;
 	private String remarks;
-	private String orderdesc;
-	
+
 	public OrderPaymentSingleDO() {
 	}
 
@@ -65,25 +64,29 @@ public class OrderPaymentSingleDO implements java.io.Serializable {
 	}
 
 	public OrderPaymentSingleDO(long tid, String accesstype, String coopinstiid,
-			String merid, String encoding, String txntype, String txnsubtype,
-			String biztype, String backurl, String txntime, String orderid,
+			String merid, String mername, String merabbr, String encoding,
+			String txntype, String txnsubtype, String biztype, String backurl,
+			String txntime, String paytimeout, String orderid,
 			String currencycode, Long txnamt, String debtorbank,
 			String debtoraccount, String debtorname, String debtorconsign,
 			String creditorbank, String creditoraccount, String creditorname,
-			String proprietary, String summary, String reserved,
-			String respcode, String respmsg, String tn, String relatetradetxn,
-			String status, String ordercommitime, String syncnotify,
-			String notes, String remarks) {
+			String proprietary, String summary, String orderdesc,
+			String reserved, String respcode, String respmsg, String tn,
+			String relatetradetxn, String status, String ordercommitime,
+			String syncnotify, String notes, String remarks) {
 		this.tid = tid;
 		this.accesstype = accesstype;
 		this.coopinstiid = coopinstiid;
 		this.merid = merid;
+		this.mername = mername;
+		this.merabbr = merabbr;
 		this.encoding = encoding;
 		this.txntype = txntype;
 		this.txnsubtype = txnsubtype;
 		this.biztype = biztype;
 		this.backurl = backurl;
 		this.txntime = txntime;
+		this.paytimeout = paytimeout;
 		this.orderid = orderid;
 		this.currencycode = currencycode;
 		this.txnamt = txnamt;
@@ -96,6 +99,7 @@ public class OrderPaymentSingleDO implements java.io.Serializable {
 		this.creditorname = creditorname;
 		this.proprietary = proprietary;
 		this.summary = summary;
+		this.orderdesc = orderdesc;
 		this.reserved = reserved;
 		this.respcode = respcode;
 		this.respmsg = respmsg;
@@ -109,6 +113,8 @@ public class OrderPaymentSingleDO implements java.io.Serializable {
 	}
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.SEQUENCE,generator="seq_order_payment_single") 
+	@SequenceGenerator(name="seq_order_payment_single",sequenceName="SEQ_ORDER_PAYMENT_SINGLE",allocationSize=1)
 	@Column(name = "TID", unique = true, nullable = false, precision = 12, scale = 0)
 	public long getTid() {
 		return this.tid;
@@ -118,7 +124,7 @@ public class OrderPaymentSingleDO implements java.io.Serializable {
 		this.tid = tid;
 	}
 
-	@Version
+	
 	@Column(name = "VERSION", length = 6)
 	public String getVersion() {
 		return this.version;
@@ -153,6 +159,24 @@ public class OrderPaymentSingleDO implements java.io.Serializable {
 
 	public void setMerid(String merid) {
 		this.merid = merid;
+	}
+
+	@Column(name = "MERNAME", length = 40)
+	public String getMername() {
+		return this.mername;
+	}
+
+	public void setMername(String mername) {
+		this.mername = mername;
+	}
+
+	@Column(name = "MERABBR", length = 40)
+	public String getMerabbr() {
+		return this.merabbr;
+	}
+
+	public void setMerabbr(String merabbr) {
+		this.merabbr = merabbr;
 	}
 
 	@Column(name = "ENCODING", length = 2)
@@ -207,6 +231,15 @@ public class OrderPaymentSingleDO implements java.io.Serializable {
 
 	public void setTxntime(String txntime) {
 		this.txntime = txntime;
+	}
+
+	@Column(name = "PAYTIMEOUT", length = 14)
+	public String getPaytimeout() {
+		return this.paytimeout;
+	}
+
+	public void setPaytimeout(String paytimeout) {
+		this.paytimeout = paytimeout;
 	}
 
 	@Column(name = "ORDERID", length = 32)
@@ -317,6 +350,15 @@ public class OrderPaymentSingleDO implements java.io.Serializable {
 		this.summary = summary;
 	}
 
+	@Column(name = "ORDERDESC", length = 256)
+	public String getOrderdesc() {
+		return this.orderdesc;
+	}
+
+	public void setOrderdesc(String orderdesc) {
+		this.orderdesc = orderdesc;
+	}
+
 	@Column(name = "RESERVED", length = 1024)
 	public String getReserved() {
 		return this.reserved;
@@ -407,37 +449,4 @@ public class OrderPaymentSingleDO implements java.io.Serializable {
 		this.remarks = remarks;
 	}
 
-	@Column(name = "MERNAME", length = 40)
-	public String getMername() {
-		return mername;
-	}
-
-	public void setMername(String mername) {
-		this.mername = mername;
-	}
-	@Column(name = "MERABBR", length = 40)
-	public String getMerabbr() {
-		return merabbr;
-	}
-
-	public void setMerabbr(String merabbr) {
-		this.merabbr = merabbr;
-	}
-	@Column(name = "PAYTIMEOUT", length = 14)
-	public String getPaytimeout() {
-		return paytimeout;
-	}
-
-	public void setPaytimeout(String paytimeout) {
-		this.paytimeout = paytimeout;
-	}
-	@Column(name = "ORDERDESC", length = 256)
-	public String getOrderdesc() {
-		return orderdesc;
-	}
-
-	public void setOrderdesc(String orderdesc) {
-		this.orderdesc = orderdesc;
-	}
-	
 }

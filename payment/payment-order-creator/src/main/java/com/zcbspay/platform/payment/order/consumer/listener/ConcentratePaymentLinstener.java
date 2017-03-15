@@ -33,7 +33,7 @@ import com.zcbspay.platform.payment.order.service.concentrate.ConcentrateOrderSe
 public class ConcentratePaymentLinstener implements MessageListenerConcurrently{
 	private static final Logger log = LoggerFactory.getLogger(InsteadPayOrderListener.class);
 	private static final ResourceBundle RESOURCE = ResourceBundle.getBundle("consumer_order");
-	private static final String KEY = "CONCENTRATECOLLECTIONORDER:";
+	private static final String KEY = "CONCENTRATEPAYMENTORDER:";
 	
 	@Autowired
 	private OrderCacheResultService orderCacheResultService;
@@ -59,7 +59,7 @@ public class ConcentratePaymentLinstener implements MessageListenerConcurrently{
 						}
 						ResultBean resultBean = null;
 						try {
-							String tn = concentrateOrderService.createRealTimeCollectionOrder(orderBean);
+							String tn = concentrateOrderService.createRealTimePaymentOrder(orderBean);
 							resultBean = new ResultBean(tn);
 						}catch (Throwable e) {
 							e.printStackTrace();

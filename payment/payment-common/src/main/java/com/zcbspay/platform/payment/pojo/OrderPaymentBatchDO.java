@@ -1,10 +1,13 @@
 package com.zcbspay.platform.payment.pojo;
 // default package
-// Generated 2017-3-13 14:30:06 by Hibernate Tools 3.4.0.CR1
+// Generated 2017-3-15 11:45:47 by Hibernate Tools 3.4.0.CR1
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
@@ -15,10 +18,6 @@ import javax.persistence.Version;
 @Table(name = "T_ORDER_PAYMENT_BATCH")
 public class OrderPaymentBatchDO implements java.io.Serializable {
 
-	/**
-	 * serialVersionUID
-	 */
-	private static final long serialVersionUID = -6844635584478170441L;
 	private long tid;
 	private String version;
 	private String accesstype;
@@ -84,6 +83,8 @@ public class OrderPaymentBatchDO implements java.io.Serializable {
 	}
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.SEQUENCE,generator="seq_order_payment_batch") 
+	@SequenceGenerator(name="seq_order_payment_batch",sequenceName="SEQ_ORDER_PAYMENT_BATCH",allocationSize=1)
 	@Column(name = "TID", unique = true, nullable = false, precision = 12, scale = 0)
 	public long getTid() {
 		return this.tid;
@@ -93,7 +94,7 @@ public class OrderPaymentBatchDO implements java.io.Serializable {
 		this.tid = tid;
 	}
 
-	@Version
+	
 	@Column(name = "VERSION", length = 6)
 	public String getVersion() {
 		return this.version;

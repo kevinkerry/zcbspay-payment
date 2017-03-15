@@ -5,4 +5,5 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
 	http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
 	<dubbo:service interface="com.zcbspay.platform.payment.order.service.OrderService" ref="orderService" retries="0" version="1.0" timeout="60000"/>
+	<dubbo:service interface="com.zcbspay.platform.payment.order.service.ConcentrateOrderService" ref="concentrateOrderService" retries="0" version="1.0" timeout="60000"/>
 </beans>

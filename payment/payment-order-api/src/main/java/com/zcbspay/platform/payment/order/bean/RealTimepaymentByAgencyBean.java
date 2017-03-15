@@ -2,26 +2,27 @@ package com.zcbspay.platform.payment.order.bean;
 
 import java.io.Serializable;
 
-public class RealTimepaymentByAgencyBean implements Serializable{
+public class RealTimepaymentByAgencyBean implements Serializable {
 
 	/**
 	 * serialVersionUID
 	 */
 	private static final long serialVersionUID = 1880089238266231064L;
+	// 报文信息
 	private String version;// 版本
 	private String encoding;// 编码方式
-	private String txnType;// 交易类型
-	private String txnSubType;// 交易子类
-	private String bizType;// 产品类型
-	private String txnTime;// 订单发送时间
-	private String merId;// 商户代码
-	private String merName;// 商户全称
+	private String backUrl;// 通知地址
+	private String merchNo;// 商户号
+	private String merName;//商户全称
 	private String merAbbr;// 商户简称
 	private String orderId;// 商户订单号
+	private String txnTime;// 订单发送时间
+	private String payTimeout;// 支付超时时间
+	private String txnAmt;// 交易金额
 	private String currencyCode;// 交易币种
-	private String txnAmt;// 金额
+	private String orderDesc;// 订单描述
 	private String reserved;// 保留域
-
+	// 代收付账户信息
 	private String debtorBank;// 付款人银行号
 	private String debtorAccount;// 付款人账号
 	private String debtorName;// 付款人名称
@@ -31,6 +32,85 @@ public class RealTimepaymentByAgencyBean implements Serializable{
 	private String creditorName;// 收款人名称
 	private String proprietary;// 业务种类编码
 	private String summary;// 摘要
+	private String coopinstiId;// 合作机构
+	
+	private String txnType;
+	/**
+	 *  交易子类
+	 */
+	private String txnSubType;
+	/**
+	 *  产品类型
+	 */
+	private String bizType;
+	/** 
+	 * 渠道类型
+	 */
+	private String channelType;
+	/**
+	 *  接入类型
+	 */
+	private String accessType;
+	/**
+	 * @return the txnType
+	 */
+	public String getTxnType() {
+		return txnType;
+	}
+	/**
+	 * @param txnType the txnType to set
+	 */
+	public void setTxnType(String txnType) {
+		this.txnType = txnType;
+	}
+	/**
+	 * @return the txnSubType
+	 */
+	public String getTxnSubType() {
+		return txnSubType;
+	}
+	/**
+	 * @param txnSubType the txnSubType to set
+	 */
+	public void setTxnSubType(String txnSubType) {
+		this.txnSubType = txnSubType;
+	}
+	/**
+	 * @return the bizType
+	 */
+	public String getBizType() {
+		return bizType;
+	}
+	/**
+	 * @param bizType the bizType to set
+	 */
+	public void setBizType(String bizType) {
+		this.bizType = bizType;
+	}
+	/**
+	 * @return the channelType
+	 */
+	public String getChannelType() {
+		return channelType;
+	}
+	/**
+	 * @param channelType the channelType to set
+	 */
+	public void setChannelType(String channelType) {
+		this.channelType = channelType;
+	}
+	/**
+	 * @return the accessType
+	 */
+	public String getAccessType() {
+		return accessType;
+	}
+	/**
+	 * @param accessType the accessType to set
+	 */
+	public void setAccessType(String accessType) {
+		this.accessType = accessType;
+	}
 	public String getVersion() {
 		return version;
 	}
@@ -43,41 +123,17 @@ public class RealTimepaymentByAgencyBean implements Serializable{
 	public void setEncoding(String encoding) {
 		this.encoding = encoding;
 	}
-	public String getTxnType() {
-		return txnType;
+	public String getBackUrl() {
+		return backUrl;
 	}
-	public void setTxnType(String txnType) {
-		this.txnType = txnType;
+	public void setBackUrl(String backUrl) {
+		this.backUrl = backUrl;
 	}
-	public String getTxnSubType() {
-		return txnSubType;
+	public String getMerchNo() {
+		return merchNo;
 	}
-	public void setTxnSubType(String txnSubType) {
-		this.txnSubType = txnSubType;
-	}
-	public String getBizType() {
-		return bizType;
-	}
-	public void setBizType(String bizType) {
-		this.bizType = bizType;
-	}
-	public String getTxnTime() {
-		return txnTime;
-	}
-	public void setTxnTime(String txnTime) {
-		this.txnTime = txnTime;
-	}
-	public String getMerId() {
-		return merId;
-	}
-	public void setMerId(String merId) {
-		this.merId = merId;
-	}
-	public String getMerName() {
-		return merName;
-	}
-	public void setMerName(String merName) {
-		this.merName = merName;
+	public void setMerchNo(String merchNo) {
+		this.merchNo = merchNo;
 	}
 	public String getMerAbbr() {
 		return merAbbr;
@@ -91,17 +147,35 @@ public class RealTimepaymentByAgencyBean implements Serializable{
 	public void setOrderId(String orderId) {
 		this.orderId = orderId;
 	}
-	public String getCurrencyCode() {
-		return currencyCode;
+	public String getTxnTime() {
+		return txnTime;
 	}
-	public void setCurrencyCode(String currencyCode) {
-		this.currencyCode = currencyCode;
+	public void setTxnTime(String txnTime) {
+		this.txnTime = txnTime;
+	}
+	public String getPayTimeout() {
+		return payTimeout;
+	}
+	public void setPayTimeout(String payTimeout) {
+		this.payTimeout = payTimeout;
 	}
 	public String getTxnAmt() {
 		return txnAmt;
 	}
 	public void setTxnAmt(String txnAmt) {
 		this.txnAmt = txnAmt;
+	}
+	public String getCurrencyCode() {
+		return currencyCode;
+	}
+	public void setCurrencyCode(String currencyCode) {
+		this.currencyCode = currencyCode;
+	}
+	public String getOrderDesc() {
+		return orderDesc;
+	}
+	public void setOrderDesc(String orderDesc) {
+		this.orderDesc = orderDesc;
 	}
 	public String getReserved() {
 		return reserved;
@@ -163,6 +237,22 @@ public class RealTimepaymentByAgencyBean implements Serializable{
 	public void setSummary(String summary) {
 		this.summary = summary;
 	}
+	public String getCoopinstiId() {
+		return coopinstiId;
+	}
+	public void setCoopinstiId(String coopinstiId) {
+		this.coopinstiId = coopinstiId;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+	public String getMerName() {
+		return merName;
+	}
+	public void setMerName(String merName) {
+		this.merName = merName;
+	}
+
 	
-	
+
 }

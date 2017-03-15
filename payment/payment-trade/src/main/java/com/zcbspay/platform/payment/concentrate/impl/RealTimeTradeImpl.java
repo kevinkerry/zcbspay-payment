@@ -13,6 +13,7 @@ import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.alibaba.rocketmq.client.producer.SendResult;
 import com.alibaba.rocketmq.remoting.exception.RemotingException;
 import com.zcbspay.platform.channel.simulation.enums.InsteadPayTagsEnum;
+import com.zcbspay.platform.channel.simulation.enums.WithholdingTagsEnum;
 import com.zcbspay.platform.channel.simulation.interfaces.Producer;
 import com.zcbspay.platform.payment.bean.ResultBean;
 import com.zcbspay.platform.payment.bean.TradeBean;
@@ -31,7 +32,7 @@ import com.zcbspay.platform.payment.risk.bean.RiskBean;
 import com.zcbspay.platform.payment.risk.exception.TradeRiskException;
 import com.zcbspay.platform.payment.risk.service.TradeRiskControlService;
 
-@Service
+@Service("realTimeTrade")
 public class RealTimeTradeImpl implements RealTimeTrade {
 	private static final Logger logger = LoggerFactory.getLogger(RealTimeTradeImpl.class);
 	@Autowired
@@ -43,6 +44,9 @@ public class RealTimeTradeImpl implements RealTimeTrade {
 	@Autowired
 	@Qualifier("cmbcInsteadPayProducer")
 	private Producer producer_cmbc_instead_pay;
+	@Autowired
+	@Qualifier("cmbcWithholdingProducer")
+	private Producer producer_cmbc_withhold;
 	@Reference(version="1.0")
 	private TradeRiskControlService tradeRiskControlService;
 	@Override
@@ -92,7 +96,7 @@ public class RealTimeTradeImpl implements RealTimeTrade {
 		
 		com.zcbspay.platform.channel.simulation.bean.ResultBean sendTradeMsgToCMBC;
 		try {
-			sendTradeMsgToCMBC = sendTradeMsgToCMBC(tradeBean);
+			sendTradeMsgToCMBC = sendTradeMsgToCollection(tradeBean);
 			if(sendTradeMsgToCMBC==null){
 				throw new PaymentQuickPayException("PC019");
 			}
@@ -108,10 +112,18 @@ public class RealTimeTradeImpl implements RealTimeTrade {
 		return resultBean;
 	}
 	
-	private com.zcbspay.platform.channel.simulation.bean.ResultBean sendTradeMsgToCMBC(TradeBean tradeBean) throws MQClientException, RemotingException, InterruptedException, MQBrokerException{
+	private com.zcbspay.platform.channel.simulation.bean.ResultBean sendTradeMsgToPayment(TradeBean tradeBean) throws MQClientException, RemotingException, InterruptedException, MQBrokerException{
 		//Producer producer = new InsteadPayProducer(ResourceBundle.getBundle("producer_cmbc").getString("single.namesrv.addr"), InsteadPayTagsEnum.INSTEADPAY_REALTIME);
-		SendResult sendResult = producer_cmbc_instead_pay.sendJsonMessage(JSON.toJSONString(tradeBean),InsteadPayTagsEnum.INSTEADPAY_REALTIME);
+		SendResult sendResult = producer_cmbc_instead_pay.sendJsonMessage(JSON.toJSONString(tradeBean),InsteadPayTagsEnum.REALTIME_PAYMENT_CONCENTRATE);
 		com.zcbspay.platform.channel.simulation.bean.ResultBean queryReturnResult = producer_cmbc_instead_pay.queryReturnResult(sendResult);
+		System.out.println(JSON.toJSONString(queryReturnResult));
+		//producer.closeProducer();
+		return queryReturnResult;
+	}
+	private com.zcbspay.platform.channel.simulation.bean.ResultBean sendTradeMsgToCollection(TradeBean tradeBean) throws MQClientException, RemotingException, InterruptedException, MQBrokerException{
+		//Producer producer = new InsteadPayProducer(ResourceBundle.getBundle("producer_cmbc").getString("single.namesrv.addr"), InsteadPayTagsEnum.INSTEADPAY_REALTIME);
+		SendResult sendResult = producer_cmbc_withhold.sendJsonMessage(JSON.toJSONString(tradeBean),WithholdingTagsEnum.REALTIME_COLLECTION_CONCENTRATE);
+		com.zcbspay.platform.channel.simulation.bean.ResultBean queryReturnResult = producer_cmbc_withhold.queryReturnResult(sendResult);
 		System.out.println(JSON.toJSONString(queryReturnResult));
 		//producer.closeProducer();
 		return queryReturnResult;
@@ -119,6 +131,7 @@ public class RealTimeTradeImpl implements RealTimeTrade {
 
 	@Override
 	public ResultBean paymentByAgency(String tn) throws ConcentrateTradeException {
+		ResultBean resultBean = null;
 		OrderPaymentSingleDO orderinfo = orderPaymentSingleDAO.getOrderinfoByTn(tn);
 		
 		if(orderinfo==null){//订单不存在
@@ -157,7 +170,25 @@ public class RealTimeTradeImpl implements RealTimeTrade {
 		txnsLogDAO.initretMsg(txnsLog.getTxnseqno());
 		orderPaymentSingleDAO.updateOrderToStartPay(txnsLog.getTxnseqno());
 		txnsLogDAO.updateTradeStatFlag(txnsLog.getTxnseqno(), TradeStatFlagEnum.READY);
-		return null;
+		TradeBean tradeBean = new TradeBean();
+		
+		tradeBean.setTxnseqno(txnsLog.getTxnseqno());
+		
+		com.zcbspay.platform.channel.simulation.bean.ResultBean sendTradeMsgToCMBC;
+		try {
+			sendTradeMsgToCMBC = sendTradeMsgToPayment(tradeBean);
+			if(sendTradeMsgToCMBC==null){
+				throw new PaymentQuickPayException("PC019");
+			}
+			resultBean = BeanCopyUtil.copyBean(ResultBean.class, sendTradeMsgToCMBC);
+		} catch (MQClientException | RemotingException | InterruptedException
+				| MQBrokerException | PaymentQuickPayException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+		
+		return resultBean;
 	}
 
 	 

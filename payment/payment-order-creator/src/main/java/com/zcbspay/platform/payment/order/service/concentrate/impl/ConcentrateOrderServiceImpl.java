@@ -33,6 +33,7 @@ import com.zcbspay.platform.payment.order.dao.TxncodeDefDAO;
 import com.zcbspay.platform.payment.order.dao.pojo.PojoProdCase;
 import com.zcbspay.platform.payment.order.dao.pojo.PojoTxncodeDef;
 import com.zcbspay.platform.payment.order.enums.BusiTypeEnum;
+import com.zcbspay.platform.payment.order.enums.BusinessEnum;
 import com.zcbspay.platform.payment.order.exception.OrderException;
 import com.zcbspay.platform.payment.order.sequence.SerialNumberService;
 import com.zcbspay.platform.payment.order.service.CommonOrderService;
@@ -98,7 +99,7 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 			}
 			checkOfOrder(orderBean);
 			checkOfRepeatSubmit(orderBean);
-			checkOfBusiness(orderBean);
+			checkOfCollectionBusiness(orderBean);
 			tn = saveCollectionOrder(orderBean);
 		} catch (OrderException e) {
 			// TODO Auto-generated catch block
@@ -168,7 +169,7 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 	 * @param orderBean
 	 * @throws OrderException
 	 */
-	public void checkOfBusiness(ConcentrateSingleOrderBean orderBean) throws OrderException {
+	public void checkOfCollectionBusiness(ConcentrateSingleOrderBean orderBean) throws OrderException {
 		PojoTxncodeDef busiModel = txncodeDefDAO.getBusiCode(orderBean.getTxnType(), orderBean.getTxnSubType(), orderBean.getBizType());
         if(busiModel==null){
         	throw new OrderException("OD045");
@@ -185,6 +186,10 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
         	PojoProdCase prodCase= prodCaseDAO.getMerchProd(member.getPrdtVer(),busiModel.getBusicode());
             if(prodCase==null){
                 throw new OrderException("OD005");
+            }
+            BusinessEnum businessEnum = BusinessEnum.fromValue(busiModel.getBusicode());
+            if(businessEnum!=BusinessEnum.CONCENTRATE_COLLECT_REALTIME){
+            	  throw new OrderException("OD045");
             }
         }else{
             throw new OrderException("OD045");
@@ -263,6 +268,14 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 		txnsLog.setAccordcommitime(DateUtil.getCurrentDateTime());
 		txnsLog.setTradestatflag(TradeStatFlagEnum.INITIAL.getStatus());// 交易初始状态
 		txnsLog.setAccmemberid("999999999999999");// 匿名会员号
+		//付款方信息
+		txnsLog.setPan(orderBean.getDebtorAccount());
+		txnsLog.setPanName(orderBean.getDebtorName());
+		txnsLog.setCardinstino(orderBean.getDebtorBank());
+		//收款信息
+		txnsLog.setInpan(orderBean.getCreditorAccount());
+		txnsLog.setInpanName(orderBean.getCreditorName());
+		txnsLog.setIncardinstino(orderBean.getCreditorBank());
 		return txnsLog;
 	}
 
@@ -299,7 +312,7 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 			}
 			checkOfPaymentSecondPay(orderBean);
 			checkOfPaymentRepeatSubmit(orderBean);
-			checkOfBusiness(orderBean);
+			checkOfPaymentBusiness(orderBean);
 			tn = savePaymentOrder(orderBean);
 		} catch (OrderException e) {
 			// TODO Auto-generated catch block
@@ -307,6 +320,35 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 		}
 		return tn;
 	}
+	private void checkOfPaymentBusiness(ConcentrateSingleOrderBean orderBean) throws OrderException {
+		// TODO Auto-generated method stub
+		PojoTxncodeDef busiModel = txncodeDefDAO.getBusiCode(orderBean.getTxnType(), orderBean.getTxnSubType(), orderBean.getBizType());
+        if(busiModel==null){
+        	throw new OrderException("OD045");
+        }
+        BusiTypeEnum busiTypeEnum = BusiTypeEnum.fromValue(busiModel.getBusitype());
+        if(busiTypeEnum==BusiTypeEnum.CONCENTRATE){//集中代收付业务
+        	if(StringUtils.isEmpty(orderBean.getMerchNo())){
+        		 throw new OrderException("OD004");
+        	}
+        	MerchantBean member = merchService.getMerchBymemberId(orderBean.getMerchNo());//memberService.getMemberByMemberId(order.getMerId());.java
+        	if(member==null){
+        		throw new OrderException("OD009");
+        	}
+        	PojoProdCase prodCase= prodCaseDAO.getMerchProd(member.getPrdtVer(),busiModel.getBusicode());
+            if(prodCase==null){
+                throw new OrderException("OD005");
+            }
+            BusinessEnum businessEnum = BusinessEnum.fromValue(busiModel.getBusicode());
+            if(businessEnum!=BusinessEnum.CONCENTRATE_PAYMENT_REALTIME){
+            	  throw new OrderException("OD045");
+            }
+        }else{
+            throw new OrderException("OD045");
+        }
+	}
+
+
 	/**
 	 * 检查订单是否为二次提交
 	 * @param orderBean
@@ -463,6 +505,14 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 			txnsLog.setAccordcommitime(DateUtil.getCurrentDateTime());
 			txnsLog.setTradestatflag(TradeStatFlagEnum.INITIAL.getStatus());// 交易初始状态
 			txnsLog.setAccmemberid("999999999999999");// 匿名会员号
+			//付款方信息
+			txnsLog.setPan(detaBean.getDebtorAccount());
+			txnsLog.setPanName(detaBean.getDebtorName());
+			txnsLog.setCardinstino(detaBean.getDebtorBank());
+			//收款信息
+			txnsLog.setInpan(detaBean.getCreditorAccount());
+			txnsLog.setInpanName(detaBean.getCreditorName());
+			txnsLog.setIncardinstino(detaBean.getCreditorBank());
 			commonOrderService.saveTxnsLog(txnsLog);
 			orderCollectDetaDAO.saveCollectOrderDeta(orderCollectDeta);
 			
@@ -649,6 +699,14 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 			txnsLog.setAccordcommitime(DateUtil.getCurrentDateTime());
 			txnsLog.setTradestatflag(TradeStatFlagEnum.INITIAL.getStatus());// 交易初始状态
 			txnsLog.setAccmemberid("999999999999999");// 匿名会员号
+			//付款方信息
+			txnsLog.setPan(detaBean.getDebtorAccount());
+			txnsLog.setPanName(detaBean.getDebtorName());
+			txnsLog.setCardinstino(detaBean.getDebtorBank());
+			//收款信息
+			txnsLog.setInpan(detaBean.getCreditorAccount());
+			txnsLog.setInpanName(detaBean.getCreditorName());
+			txnsLog.setIncardinstino(detaBean.getCreditorBank());
 			commonOrderService.saveTxnsLog(txnsLog);
 			orderPaymentDetaDAO.savePaymentDetaOrder(orderPaymentDeta);
 			

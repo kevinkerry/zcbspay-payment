@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
 import com.zcbspay.platform.payment.bean.ResultBean;
+import com.zcbspay.platform.payment.concentrate.RealTimeTrade;
+import com.zcbspay.platform.payment.exception.ConcentrateTradeException;
 import com.zcbspay.platform.payment.exception.PaymentInsteadPayException;
 import com.zcbspay.platform.payment.exception.PaymentQuickPayException;
 import com.zcbspay.platform.payment.exception.PaymentRouterException;
@@ -16,26 +18,53 @@ import com.zcbspay.platform.payment.quickpay.service.QuickPayService;
 import com.zcbspay.platform.payment.quickpay.service.RealTimeInsteadPayService;
 import com.zcbspay.platform.payment.utils.DateUtil;
 
-public class QuickPayServiceTest extends BaseTest{
+public class QuickPayServiceTest extends BaseTest {
 
-	private static final Logger logger = LoggerFactory.getLogger(QuickPayServiceTest.class);
-	@Reference(version="1.0")
+	private static final Logger logger = LoggerFactory
+			.getLogger(QuickPayServiceTest.class);
+	@Reference(version = "1.0")
 	private QuickPayService quickPayService;
-	@Reference(version="1.0")
+	@Reference(version = "1.0")
 	private RealTimeInsteadPayService realTimeInsteadPayService;
-	
+	@Reference(version = "1.0")
+	private RealTimeTrade realTimeTrade;
+
 	@Test
-	public void testAll(){
-		//实时代收
-		test_pay("170222061000000028");
-		//实时代付
-		//test_instead_pay("170220061000000009");
+	public void testAll() {
+		// 实时代收
+		// test_pay("170222061000000028");
+		// 实时代付
+		// test_instead_pay("170220061000000009");
+		// 集中代付-实时
+		// test_concentrate_collect("170315061000000043");
+		test_concentrate_payment("170315061000000041");
 	}
-	
-	
-	
-	//@Test
-	public void test_pay(String tn){
+
+	public void test_concentrate_payment(String tn) {
+		// TODO Auto-generated method stub
+		try {
+			ResultBean collectionCharges = realTimeTrade.paymentByAgency(tn);
+			System.out.println(JSON.toJSONString(collectionCharges));
+		} catch (ConcentrateTradeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	public void test_concentrate_collect(String tn) {
+		// TODO Auto-generated method stub
+		try {
+			ResultBean collectionCharges = realTimeTrade.collectionCharges(tn);
+			System.out.println(JSON.toJSONString(collectionCharges));
+		} catch (ConcentrateTradeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	// @Test
+	public void test_pay(String tn) {
 		PayBean payBean = new PayBean();
 		payBean.setCardNo("6228480018543668979");
 		payBean.setCardKeeper("郭佳");
@@ -55,8 +84,9 @@ public class QuickPayServiceTest extends BaseTest{
 			e.printStackTrace();
 		}
 	}
-	//@Test
-	public void test_instead_pay(String tn){
+
+	// @Test
+	public void test_instead_pay(String tn) {
 		com.zcbspay.platform.payment.quickpay.bean.InsteadPayOrderBean insteadPayOrderBean = new InsteadPayOrderBean();
 		insteadPayOrderBean.setBizType("000207");
 		insteadPayOrderBean.setTxnType("70");
@@ -75,7 +105,8 @@ public class QuickPayServiceTest extends BaseTest{
 		insteadPayOrderBean.setTn(tn);
 		insteadPayOrderBean.setOrderId("1485068751913");
 		try {
-			ResultBean singleInsteadPay = realTimeInsteadPayService.singleInsteadPay(insteadPayOrderBean);
+			ResultBean singleInsteadPay = realTimeInsteadPayService
+					.singleInsteadPay(insteadPayOrderBean);
 			logger.info(JSON.toJSONString(singleInsteadPay));
 		} catch (PaymentInsteadPayException | PaymentQuickPayException
 				| PaymentRouterException e) {
