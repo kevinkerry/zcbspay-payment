@@ -1,6 +1,8 @@
 package com.zcbspay.platform.payment.dao.impl;
 
 import org.hibernate.Criteria;
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -34,4 +36,33 @@ public class OrderCollectBatchDAOImpl extends HibernateBaseDAOImpl<OrderCollectB
 		return uniqueResult;
 	}
 
+	@Override
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+	public OrderCollectBatchDO getCollectBatchOrderByTn(String tn) {
+		Criteria criteria = getSession().createCriteria(OrderCollectBatchDO.class);
+		criteria.add(Restrictions.eq("tn", tn));
+		OrderCollectBatchDO uniqueResult = (OrderCollectBatchDO) criteria.uniqueResult();
+		return uniqueResult;
+	}
+
+	
+	@Override
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Throwable.class)
+	public void updateOrderToStartPay(String tn) {
+		// TODO Auto-generated method stub
+		Session session = getSession();
+		Query query = session
+				.createQuery("update OrderCollectBatchDO set status = ? where tn = ? and (status=? or status = ?)");
+
+		Object[] paramaters = new Object[] { "02", tn, "01", "03" };
+		if (paramaters != null) {
+			for (int i = 0; i < paramaters.length; i++) {
+				query.setParameter(i, paramaters[i]);
+			}
+		}
+		int rows = query.executeUpdate();
+		if (rows != 1) {
+			//throw new PaymentQuickPayException("T011");
+		}
+	}
 }

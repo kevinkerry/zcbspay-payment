@@ -79,18 +79,12 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 	private OrderPaymentBatchDAO orderPaymentBatchDAO;
 	@Autowired
 	private OrderPaymentDetaDAO orderPaymentDetaDAO;
+	
+	
+	
+	
 	@Override
-	public String createRealTimeCollectionOrder(
-			ConcentrateSingleOrderBean orderBean) {
-		/**
-		 * 1.检查订单是否为二次支付
-		 * 2.检查订单是否为二次提交
-		 * 3.检查订单业务有效性
-		 * 4.检查商户和合作机构有效性
-		 * 5.检查消费订单特殊性要求检查，如果没有可以为空
-		 * 6.检查消费订单特殊性要求检查，如果没有可以为空
-		 * 7.保存订单信息
-		 */
+	public String createRealTimeCollectionOrder(ConcentrateSingleOrderBean orderBean) {
 		String tn = null;
 		try {
 			tn = checkOfSecondPay(orderBean);
@@ -107,7 +101,42 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 		}
 		return tn;
 	}
+	@Override
+	public String createRealTimePaymentOrder(ConcentrateSingleOrderBean orderBean) {
+		String tn = null;
+		try {
+			tn = checkOfSecondPay(orderBean);
+			if(StringUtils.isNotEmpty(tn)){
+				return null;
+			}
+			checkOfPaymentSecondPay(orderBean);
+			checkOfPaymentRepeatSubmit(orderBean);
+			checkOfPaymentBusiness(orderBean);
+			tn = savePaymentOrder(orderBean);
+		} catch (OrderException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return tn;
+	}
 	
+	@Override
+	public String createBatchCollectionOrder(ConcentrateBatchOrderBean orderBean) throws OrderException {
+		checkOfBatchOrder(orderBean);
+		checkOfBatchRepeatSubmit(orderBean);
+		checkOfBatchCollectionBusiness(orderBean);
+		String tn = saveCollectionBatchOrder(orderBean);
+		return tn;
+	}
+	
+	@Override
+	public String createBatchPaymentOrder(ConcentrateBatchOrderBean orderBean) throws OrderException {
+		checkOfBatchOrder(orderBean);
+		checkOfPaymentBatchRepeatSubmit(orderBean);
+		checkOfBatchPaymentBusiness(orderBean);
+		String tn = savePaymentBatchOrder(orderBean);
+		return tn;
+	}
 	
 	/**
 	 * 检查订单二次支付
@@ -276,6 +305,7 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 		txnsLog.setInpan(orderBean.getCreditorAccount());
 		txnsLog.setInpanName(orderBean.getCreditorName());
 		txnsLog.setIncardinstino(orderBean.getCreditorBank());
+		txnsLog.setAccbusicode(busiModel.getBusicode());
 		return txnsLog;
 	}
 
@@ -292,34 +322,7 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 	
 	
 	
-	@Override
-	public String createRealTimePaymentOrder(
-			ConcentrateSingleOrderBean orderBean) {
-		/**
-		 * 1.检查订单是否为二次支付
-		 * 2.检查订单是否为二次提交
-		 * 3.检查订单业务有效性
-		 * 4.检查商户和合作机构有效性
-		 * 5.检查消费订单特殊性要求检查，如果没有可以为空
-		 * 6.检查消费订单特殊性要求检查，如果没有可以为空
-		 * 7.保存订单信息
-		 */
-		String tn = null;
-		try {
-			tn = checkOfSecondPay(orderBean);
-			if(StringUtils.isNotEmpty(tn)){
-				return null;
-			}
-			checkOfPaymentSecondPay(orderBean);
-			checkOfPaymentRepeatSubmit(orderBean);
-			checkOfPaymentBusiness(orderBean);
-			tn = savePaymentOrder(orderBean);
-		} catch (OrderException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return tn;
-	}
+	
 	private void checkOfPaymentBusiness(ConcentrateSingleOrderBean orderBean) throws OrderException {
 		// TODO Auto-generated method stub
 		PojoTxncodeDef busiModel = txncodeDefDAO.getBusiCode(orderBean.getTxnType(), orderBean.getTxnSubType(), orderBean.getBizType());
@@ -442,21 +445,16 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 	}
 
 
-	@Override
-	public String createBatchCollectionOrder(ConcentrateBatchOrderBean orderBean) throws OrderException {
-		checkOfBatchOrder(orderBean);
-		checkOfBatchRepeatSubmit(orderBean);
-		checkOfBatchBusiness(orderBean);
-		saveCollectionBatchOrder(orderBean);
-		
-		return null;
-	}
-	private void saveCollectionBatchOrder(ConcentrateBatchOrderBean orderBean) {
+	
+	private String saveCollectionBatchOrder(ConcentrateBatchOrderBean orderBean) {
+		String TN = serialNumberService.generateTN(orderBean.getMerId());
 		//保存批次订单数据
 		OrderCollectBatchDO orderCollectBatch = generateCollectBatchOrderBean(orderBean);
+		orderCollectBatch.setTn(TN);
 		orderCollectBatch = orderCollectBatchDAO.saveCollectBatchOrder(orderCollectBatch);
 		//保存批次明细数据和交易流水
 		saveDetaOrder(orderCollectBatch.getTid(), orderBean);
+		return TN;
 	}
 	
 	private void saveDetaOrder(long batchId,ConcentrateBatchOrderBean orderBean) {
@@ -513,6 +511,8 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 			txnsLog.setInpan(detaBean.getCreditorAccount());
 			txnsLog.setInpanName(detaBean.getCreditorName());
 			txnsLog.setIncardinstino(detaBean.getCreditorBank());
+			txnsLog.setTxnseqno(txnseqno);
+			txnsLog.setAccbusicode(busiModel.getBusicode());
 			commonOrderService.saveTxnsLog(txnsLog);
 			orderCollectDetaDAO.saveCollectOrderDeta(orderCollectDeta);
 			
@@ -553,7 +553,7 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 	 * @param orderBean
 	 * @throws OrderException
 	 */
-	public void checkOfBatchBusiness(ConcentrateBatchOrderBean orderBean) throws OrderException {
+	public void checkOfBatchCollectionBusiness(ConcentrateBatchOrderBean orderBean) throws OrderException {
 		PojoTxncodeDef busiModel = txncodeDefDAO.getBusiCode(orderBean.getTxnType(), orderBean.getTxnSubType(), orderBean.getBizType());
         if(busiModel==null){
         	throw new OrderException("OD045");
@@ -570,6 +570,42 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
         	PojoProdCase prodCase= prodCaseDAO.getMerchProd(member.getPrdtVer(),busiModel.getBusicode());
             if(prodCase==null){
                 throw new OrderException("OD005");
+            }
+            
+            BusinessEnum businessEnum = BusinessEnum.fromValue(busiModel.getBusicode());
+            if(businessEnum!=BusinessEnum.CONCENTRATE_COLLECT_BATCH){
+            	throw new OrderException("OD045");
+            }
+        }else{
+            throw new OrderException("OD045");
+        }
+	}
+	/**
+	 * 检查订单业务有效性
+	 * @param orderBean
+	 * @throws OrderException
+	 */
+	public void checkOfBatchPaymentBusiness(ConcentrateBatchOrderBean orderBean) throws OrderException {
+		PojoTxncodeDef busiModel = txncodeDefDAO.getBusiCode(orderBean.getTxnType(), orderBean.getTxnSubType(), orderBean.getBizType());
+        if(busiModel==null){
+        	throw new OrderException("OD045");
+        }
+        BusiTypeEnum busiTypeEnum = BusiTypeEnum.fromValue(busiModel.getBusitype());
+        if(busiTypeEnum==BusiTypeEnum.CONCENTRATE){//集中代收付业务
+        	if(StringUtils.isEmpty(orderBean.getMerId())){
+        		 throw new OrderException("OD004");
+        	}
+        	MerchantBean member = merchService.getMerchBymemberId(orderBean.getMerId());//memberService.getMemberByMemberId(order.getMerId());.java
+        	if(member==null){
+        		throw new OrderException("OD009");
+        	}
+        	PojoProdCase prodCase= prodCaseDAO.getMerchProd(member.getPrdtVer(),busiModel.getBusicode());
+            if(prodCase==null){
+                throw new OrderException("OD005");
+            }
+            BusinessEnum businessEnum = BusinessEnum.fromValue(busiModel.getBusicode());
+            if(businessEnum!=BusinessEnum.CONCENTRATE_PAYMENT_BATCH){
+            	throw new OrderException("OD045");
             }
         }else{
             throw new OrderException("OD045");
@@ -619,18 +655,11 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 	}
 
 
-	@Override
-	public String createBatchPaymentOrder(ConcentrateBatchOrderBean orderBean) throws OrderException {
-		checkOfBatchOrder(orderBean);
-		checkOfPaymentBatchRepeatSubmit(orderBean);
-		checkOfBatchBusiness(orderBean);
-		savePaymentBatchOrder(orderBean);
-		return null;
-	}
+	
 
 	private void checkOfPaymentBatchRepeatSubmit(
 			ConcentrateBatchOrderBean orderBean) throws OrderException {
-		OrderPaymentBatchDO orderInfo = orderPaymentBatchDAO.getCollectBatchOrder(orderBean.getMerId(), orderBean.getBatchNo(), orderBean.getTxnTime().substring(0, 8));
+		OrderPaymentBatchDO orderInfo = orderPaymentBatchDAO.getPaymentBatchOrder(orderBean.getMerId(), orderBean.getBatchNo(), orderBean.getTxnTime().substring(0, 8));
 		if (orderInfo != null) {
 			if ("00".equals(orderInfo.getStatus())) {// 交易成功订单不可二次支付
 				throw new OrderException("OD001","订单交易成功，请不要重复支付");
@@ -645,12 +674,15 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 		}
 		
 	}
-	private void savePaymentBatchOrder(ConcentrateBatchOrderBean orderBean) {
+	private String savePaymentBatchOrder(ConcentrateBatchOrderBean orderBean) {
+		String TN = serialNumberService.generateTN(orderBean.getMerId());
 		//保存批次订单数据
 		OrderPaymentBatchDO orderPaymentBatch = generatePaymentBatchOrderBean(orderBean);
+		orderPaymentBatch.setTn(TN);
 		orderPaymentBatch = orderPaymentBatchDAO.savePaymentBatchOrder(orderPaymentBatch);
 		//保存批次明细数据和交易流水
 		savePaymentDetaOrder(orderPaymentBatch.getTid(), orderBean);
+		return TN;
 	}
 	
 	private void savePaymentDetaOrder(long batchId,ConcentrateBatchOrderBean orderBean) {
@@ -707,6 +739,8 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 			txnsLog.setInpan(detaBean.getCreditorAccount());
 			txnsLog.setInpanName(detaBean.getCreditorName());
 			txnsLog.setIncardinstino(detaBean.getCreditorBank());
+			txnsLog.setTxnseqno(txnseqno);
+			txnsLog.setAccbusicode(busiModel.getBusicode());
 			commonOrderService.saveTxnsLog(txnsLog);
 			orderPaymentDetaDAO.savePaymentDetaOrder(orderPaymentDeta);
 			
@@ -727,7 +761,8 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 		orderPaymentSingle.setTxnsubtype(orderBean.getTxnSubType());
 		orderPaymentSingle.setBackurl(orderBean.getBackUrl());
 		orderPaymentSingle.setBatchno(orderBean.getBatchNo());
-		orderPaymentSingle.setTxntime(orderBean.getTxnTime());
+		orderPaymentSingle.setTxndate(orderBean.getTxnTime().substring(0,8));
+		orderPaymentSingle.setTxntime(orderBean.getTxnTime().substring(8));
 		
 		orderPaymentSingle.setTotalqty(Long.valueOf(orderBean.getTotalQty()));
 		orderPaymentSingle.setTotalamt(Long.valueOf(orderBean.getTotalAmt()));

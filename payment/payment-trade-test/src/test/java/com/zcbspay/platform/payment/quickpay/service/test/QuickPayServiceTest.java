@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
 import com.zcbspay.platform.payment.bean.ResultBean;
+import com.zcbspay.platform.payment.concentrate.BatchTrade;
 import com.zcbspay.platform.payment.concentrate.RealTimeTrade;
 import com.zcbspay.platform.payment.exception.ConcentrateTradeException;
 import com.zcbspay.platform.payment.exception.PaymentInsteadPayException;
@@ -28,16 +29,44 @@ public class QuickPayServiceTest extends BaseTest {
 	private RealTimeInsteadPayService realTimeInsteadPayService;
 	@Reference(version = "1.0")
 	private RealTimeTrade realTimeTrade;
-
+	@Reference(version = "1.0")
+	private BatchTrade batchTrade;
 	@Test
 	public void testAll() {
 		// 实时代收
 		// test_pay("170222061000000028");
 		// 实时代付
 		// test_instead_pay("170220061000000009");
-		// 集中代付-实时
+		// 集中代收-实时
 		// test_concentrate_collect("170315061000000043");
-		test_concentrate_payment("170315061000000041");
+		// 集中代付-实时
+		//test_concentrate_payment("170315061000000041");
+		//集中代收-批量
+		//test_concentrate_collect_batch("170316061000000050");
+		//集中代付-批量
+		test_concentrate_payment_batch("170316061000000051");
+	}
+	public void test_concentrate_payment_batch(String tn) {
+		// TODO Auto-generated method stub
+		try {
+			ResultBean collectionCharges = batchTrade.paymentByAgency(tn);
+			System.out.println(JSON.toJSONString(collectionCharges));
+		} catch (ConcentrateTradeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	public void test_concentrate_collect_batch(String tn) {
+		// TODO Auto-generated method stub
+		try {
+			ResultBean collectionCharges = batchTrade.collectionCharges(tn);
+			System.out.println(JSON.toJSONString(collectionCharges));
+		} catch (ConcentrateTradeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 	public void test_concentrate_payment(String tn) {

@@ -1,10 +1,15 @@
 package com.zcbspay.platform.payment.order.service.test;
 
+import java.util.List;
+
 import org.junit.Test;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.google.common.collect.Lists;
 import com.zcbspay.platform.member.merchant.service.MerchService;
 import com.zcbspay.platform.payment.exception.PaymentOrderException;
+import com.zcbspay.platform.payment.order.bean.ConcentrateBatchOrderBean;
+import com.zcbspay.platform.payment.order.bean.ConcentrateOrderDetaBean;
 import com.zcbspay.platform.payment.order.bean.InsteadPayOrderBean;
 import com.zcbspay.platform.payment.order.bean.RealTimeCollectionChargesBean;
 import com.zcbspay.platform.payment.order.bean.RealTimepaymentByAgencyBean;
@@ -30,13 +35,99 @@ public class OrderServiceTest extends BaseTest{
 		//代付订单
 		//test_insteadPay_order();
 		//集中代收
-		test_collect_order();
+		//test_collect_order();
 		//集中代付
 		//test_payment_order();
-		
+		//集中代收-批量
+		//test_collect_order_batch();
+		//集中代付-批量
+		test_payment_order_batch();
 		System.out.println("excute time:"+(System.currentTimeMillis()-currentTime));
 	}
 	
+	public void test_payment_order_batch() {
+		try {
+			ConcentrateBatchOrderBean concentrateBatchOrderBean = new ConcentrateBatchOrderBean();
+			concentrateBatchOrderBean.setVersion("1.0");
+			concentrateBatchOrderBean.setEncoding("1");
+			concentrateBatchOrderBean.setTxnType("02");
+			concentrateBatchOrderBean.setTxnSubType("00");
+			concentrateBatchOrderBean.setBizType("000003");
+			concentrateBatchOrderBean.setMerId("200000000000610");
+			concentrateBatchOrderBean.setBackUrl("");
+			concentrateBatchOrderBean.setBatchNo(DateUtil.getCurrentDate()+System.currentTimeMillis()+"");
+			concentrateBatchOrderBean.setTxnTime(DateUtil.getCurrentDateTime());
+			concentrateBatchOrderBean.setTotalQty("5");
+			concentrateBatchOrderBean.setTotalAmt("50"); 
+			concentrateBatchOrderBean.setReserved("");
+			List<ConcentrateOrderDetaBean> detaList = Lists.newArrayList();
+			for(int i=0;i<5;i++){
+				ConcentrateOrderDetaBean detaBean = new ConcentrateOrderDetaBean();
+				detaBean.setOrderId(System.currentTimeMillis()+"");
+				detaBean.setCurrencyCode("156");
+				detaBean.setAmt("10");
+				detaBean.setDebtorBank("203121000010");
+				detaBean.setDebtorAccount("6228480018543668979");
+				detaBean.setDebtorName("测试账户1");
+				detaBean.setDebtorConsign("0987654");
+				detaBean.setCreditorBank("203121000010");
+				detaBean.setCreditorAccount("6228480018543668970");
+				detaBean.setCreditorName("测试账户2");
+				detaBean.setProprietary("09001");
+				detaBean.setSummary("test"+i);
+				detaList.add(detaBean);
+			}
+			concentrateBatchOrderBean.setDetaList(detaList);
+			String tn = concentrateOrderService.createPaymentByAgencyBatchOrder(concentrateBatchOrderBean);
+			System.out.println("test_payment_order_batch TN:"+tn);
+		} catch (PaymentOrderException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+
+	public void test_collect_order_batch() {
+		try {
+			ConcentrateBatchOrderBean concentrateBatchOrderBean = new ConcentrateBatchOrderBean();
+			concentrateBatchOrderBean.setVersion("1.0");
+			concentrateBatchOrderBean.setEncoding("1");
+			concentrateBatchOrderBean.setTxnType("01");
+			concentrateBatchOrderBean.setTxnSubType("00");
+			concentrateBatchOrderBean.setBizType("000003");
+			concentrateBatchOrderBean.setMerId("200000000000610");
+			concentrateBatchOrderBean.setBackUrl("");
+			concentrateBatchOrderBean.setBatchNo(DateUtil.getCurrentDate()+System.currentTimeMillis()+"");
+			concentrateBatchOrderBean.setTxnTime(DateUtil.getCurrentDateTime());
+			concentrateBatchOrderBean.setTotalQty("5");
+			concentrateBatchOrderBean.setTotalAmt("50"); 
+			concentrateBatchOrderBean.setReserved("");
+			List<ConcentrateOrderDetaBean> detaList = Lists.newArrayList();
+			for(int i=0;i<5;i++){
+				ConcentrateOrderDetaBean detaBean = new ConcentrateOrderDetaBean();
+				detaBean.setOrderId(System.currentTimeMillis()+"");
+				detaBean.setCurrencyCode("156");
+				detaBean.setAmt("10");
+				detaBean.setDebtorBank("203121000010");
+				detaBean.setDebtorAccount("6228480018543668979");
+				detaBean.setDebtorName("测试账户1");
+				detaBean.setDebtorConsign("0987654");
+				detaBean.setCreditorBank("203121000010");
+				detaBean.setCreditorAccount("6228480018543668970");
+				detaBean.setCreditorName("测试账户2");
+				detaBean.setProprietary("09001");
+				detaBean.setSummary("test"+i);
+				detaList.add(detaBean);
+			}
+			concentrateBatchOrderBean.setDetaList(detaList);
+			String tn = concentrateOrderService.createCollectionChargesBatchOrder(concentrateBatchOrderBean);
+			System.out.println("test_collect_order_batch TN:"+tn);
+		} catch (PaymentOrderException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	public void test_payment_order(){
 		try {
 			RealTimepaymentByAgencyBean realTimepaymentByAgencyBean = new RealTimepaymentByAgencyBean();

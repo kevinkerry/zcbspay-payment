@@ -72,8 +72,8 @@ public class QuickPayServiceImpl implements QuickPayService{
 	@Autowired
 	@Qualifier("cmbcWithholdingProducer")
 	private Producer producer_cmbc_withhold;
-	@Autowired
-	@Qualifier("unionpayWithholdingProducer")
+	//@Autowired
+	//@Qualifier("unionpayWithholdingProducer")
 	private com.zcbspay.platform.channel.unionpay.interfaces.Producer producer_un_withhold;
 	@Reference(version="1.0")
 	private TradeRiskControlService tradeRiskControlService;

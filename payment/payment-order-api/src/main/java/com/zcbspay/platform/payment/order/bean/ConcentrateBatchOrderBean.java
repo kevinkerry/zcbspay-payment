@@ -1,8 +1,9 @@
 package com.zcbspay.platform.payment.order.bean;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class ConcentrateBatchOrderBean {
+public class ConcentrateBatchOrderBean implements Serializable{
 
 	/**
 	 * serialVersionUID

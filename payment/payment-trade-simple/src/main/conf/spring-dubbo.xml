@@ -8,6 +8,6 @@
 	<dubbo:service interface="com.zcbspay.platform.payment.quickpay.service.QuickPayService" ref="quickPayService" retries="0" version="1.0" timeout="60000"/>
 	<dubbo:service interface="com.zcbspay.platform.payment.quickpay.service.RealTimeInsteadPayService" ref="realTimeInsteadPayService" retries="0" version="1.0" timeout="60000"/>
 	<dubbo:service interface="com.zcbspay.platform.payment.concentrate.RealTimeTrade" ref="realTimeTrade" retries="0" version="1.0" timeout="60000"/>
-	
+	<dubbo:service interface="com.zcbspay.platform.payment.concentrate.BatchTrade" ref="batchTrade" retries="0" version="1.0" timeout="60000"/>
 	<dubbo:annotation package="com.zcbspay.platform.payment"/>
 </beans>

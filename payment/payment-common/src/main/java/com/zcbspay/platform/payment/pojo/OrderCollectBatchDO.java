@@ -42,7 +42,7 @@ public class OrderCollectBatchDO implements java.io.Serializable {
 	private String syncnotify;
 	private String notes;
 	private String remarks;
-
+	private String tn;
 	public OrderCollectBatchDO() {
 	}
 
@@ -301,5 +301,13 @@ public class OrderCollectBatchDO implements java.io.Serializable {
 	public void setRemarks(String remarks) {
 		this.remarks = remarks;
 	}
+	
+	@Column(name = "TN", length = 32)
+	public String getTn() {
+		return this.tn;
+	}
 
+	public void setTn(String tn) {
+		this.tn = tn;
+	}
 }

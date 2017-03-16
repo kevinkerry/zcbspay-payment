@@ -19,4 +19,17 @@ public interface OrderCollectBatchDAO extends BaseDAO<OrderCollectBatchDO> {
 	 * @return
 	 */
 	public OrderCollectBatchDO getCollectBatchOrder(String merchNo,String batchNo,String txndate);
+	
+	/**
+	 * 通过tn获取代收批次数据
+	 * @param tn
+	 * @return
+	 */
+	public OrderCollectBatchDO getCollectBatchOrderByTn(String tn);
+	
+	/**
+	 * 更新订单状态为开始支付
+	 * @param tn
+	 */
+	public void updateOrderToStartPay(String tn);
 }

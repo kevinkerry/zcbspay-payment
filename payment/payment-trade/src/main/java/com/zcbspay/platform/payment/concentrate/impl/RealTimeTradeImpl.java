@@ -87,7 +87,7 @@ public class RealTimeTradeImpl implements RealTimeTrade {
 			
 		}
 		txnsLogDAO.initretMsg(txnsLog.getTxnseqno());
-		orderCollectSingleDAO.updateOrderToStartPay(txnsLog.getTxnseqno());
+		orderCollectSingleDAO.updateOrderToStartPay(tn);
 		txnsLogDAO.updateTradeStatFlag(txnsLog.getTxnseqno(), TradeStatFlagEnum.READY);
 		
 		TradeBean tradeBean = new TradeBean();
