@@ -15,6 +15,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.zcbspay.platform.payment.trade.route.dao.MerchBankAccountDAO;
 import com.zcbspay.platform.payment.trade.route.dao.RouteConfigDAO;
 import com.zcbspay.platform.payment.trade.route.exception.TradeRouteException;
 import com.zcbspay.platform.payment.trade.route.service.RouteConfigService;
@@ -32,6 +33,8 @@ public class RouteConfigServiceImpl implements RouteConfigService{
 
 	@Autowired
 	private RouteConfigDAO routeConfigDAO;
+	@Autowired
+	private MerchBankAccountDAO merchBankAccountDAO;
 	/**
 	 *
 	 * @param transTime
@@ -55,6 +58,12 @@ public class RouteConfigServiceImpl implements RouteConfigService{
 	public Map<String, Object> getCardInfo(String cardNo) {
 		// TODO Auto-generated method stub
 		return routeConfigDAO.getCardInfo(cardNo);
+	}
+	@Override
+	public String getTradeChannel(String merchNo, String accountno,
+			String protocoltype) throws TradeRouteException{
+		// TODO Auto-generated method stub
+		return merchBankAccountDAO.getTradeRoute(merchNo, accountno, protocoltype).getChannelcode();
 	}
 
 	

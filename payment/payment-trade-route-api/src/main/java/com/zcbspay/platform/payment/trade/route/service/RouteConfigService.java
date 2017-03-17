@@ -42,4 +42,13 @@ public interface RouteConfigService {
 	 * @return
 	 */
 	public Map<String, Object> getCardInfo(String cardNo);
+	
+	/**
+	 * 获取交易渠道路由
+	 * @param merchNo 商户号
+	 * @param accountno 账户号
+	 * @param protocoltype 协议类型
+	 * @return
+	 */
+	public String getTradeChannel(String merchNo,String accountno,String protocoltype) throws TradeRouteException;
 }
