@@ -18,6 +18,7 @@ import com.zcbspay.platform.payment.bean.ResultBean;
 import com.zcbspay.platform.payment.order.consume.bean.ConcentrateBatchOrderBean;
 import com.zcbspay.platform.payment.order.consume.bean.ConcentrateSingleOrderBean;
 import com.zcbspay.platform.payment.order.consumer.enums.OrderTagsEnum;
+import com.zcbspay.platform.payment.order.exception.OrderException;
 import com.zcbspay.platform.payment.order.service.OrderCacheResultService;
 import com.zcbspay.platform.payment.order.service.concentrate.ConcentrateOrderService;
 
@@ -61,6 +62,10 @@ public class ConcentratePaymentLinstener implements MessageListenerConcurrently{
 						try {
 							String tn = concentrateOrderService.createRealTimePaymentOrder(orderBean);
 							resultBean = new ResultBean(tn);
+						} catch (OrderException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+							resultBean = new ResultBean(e.getCode(),e.getMessage());
 						}catch (Throwable e) {
 							e.printStackTrace();
 							resultBean = new ResultBean("T000",e.getMessage());
@@ -82,6 +87,10 @@ public class ConcentratePaymentLinstener implements MessageListenerConcurrently{
 					try {
 						String tn = concentrateOrderService.createBatchPaymentOrder(orderBean);
 						resultBean = new ResultBean(tn);
+					} catch (OrderException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						resultBean = new ResultBean(e.getCode(),e.getMessage());
 					}catch (Throwable e) {
 						e.printStackTrace();
 						resultBean = new ResultBean("T000",e.getMessage());

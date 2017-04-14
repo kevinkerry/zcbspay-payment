@@ -189,6 +189,23 @@ public class RealTimeTradeImpl implements RealTimeTrade {
 			throw new ConcentrateTradeException("PC012");
 			
 		}
+		//计算交易手续费
+		try {
+			FeeBean feeBean = new FeeBean();
+			feeBean.setBusiCode(txnsLog.getBusicode());
+			feeBean.setFeeVer(txnsLog.getFeever());
+			feeBean.setTxnAmt(txnsLog.getAmount()+"");
+			feeBean.setMerchNo(txnsLog.getAccsecmerno());
+			feeBean.setCardType("1");
+			feeBean.setTxnseqnoOg("");
+			feeBean.setTxnseqno(txnsLog.getTxnseqno());
+			long fee = tradeFeeService.getCommonFee(feeBean);
+			txnsLogDAO.updateTradeFee(txnsLog.getTxnseqno(), fee);
+		} catch (TradeFeeException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			throw new ConcentrateTradeException("PC028");
+		}
 		txnsLogDAO.initretMsg(txnsLog.getTxnseqno());
 		orderPaymentSingleDAO.updateOrderToStartPay(txnsLog.getTxnseqno());
 		txnsLogDAO.updateTradeStatFlag(txnsLog.getTxnseqno(), TradeStatFlagEnum.READY);

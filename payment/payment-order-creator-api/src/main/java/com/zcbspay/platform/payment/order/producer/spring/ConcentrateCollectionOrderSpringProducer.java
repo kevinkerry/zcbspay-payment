@@ -88,7 +88,7 @@ public class ConcentrateCollectionOrderSpringProducer implements Producer{
 	 */
 	@Override
 	public ResultBean queryReturnResult(SendResult sendResult) {
-		logger.info("【InsteadPayOrderProducer receive Result message】{}",JSON.toJSONString(sendResult));
+		logger.info("【ConcentrateCollectionOrderSpringProducer receive Result message】{}",JSON.toJSONString(sendResult));
 		logger.info("msgID:{}",sendResult.getMsgId());
 		String tn = getTnByCycle(sendResult.getMsgId());
 		logger.info("从redis中取得key【{}】值为{}",KEY+sendResult.getMsgId(),tn);
@@ -98,15 +98,10 @@ public class ConcentrateCollectionOrderSpringProducer implements Producer{
 			logger.info("msgID:{},结果数据:{}",sendResult.getMsgId(),JSON.toJSONString(resultBean));
 			return resultBean;
 		}else{
-			try {
-				Thread.sleep(900);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			throw new IllegalArgumentException("系统异常无法渠道返回结果");
 		}
-		logger.info("end time {}",System.currentTimeMillis());
-		return null;
+		//logger.info("end time {}",System.currentTimeMillis());
+		//return null;
 	}
 	private String getTnByCycle(String msgId){
 		Jedis jedis = RedisFactory.getInstance().getRedis();

@@ -33,6 +33,7 @@ import com.zcbspay.platform.payment.fee.service.TradeFeeService;
 import com.zcbspay.platform.payment.pojo.OrderCollectBatchDO;
 import com.zcbspay.platform.payment.pojo.OrderCollectDetaDO;
 import com.zcbspay.platform.payment.pojo.OrderPaymentBatchDO;
+import com.zcbspay.platform.payment.pojo.OrderPaymentDetaDO;
 import com.zcbspay.platform.payment.pojo.PojoTxnsLog;
 import com.zcbspay.platform.payment.risk.bean.RiskBean;
 import com.zcbspay.platform.payment.risk.exception.TradeRiskException;
@@ -156,6 +157,50 @@ public class BatchTradeImpl implements BatchTrade {
 		}
 		if("04".equals(orderPaymentBatch.getStatus())){//订单过期
 			throw new ConcentrateTradeException("PC017");
+		}
+		List<OrderPaymentDetaDO> paymentDetaList = orderPaymentDetaDAO.getDetaListByBatchtid(orderPaymentBatch.getTid());
+		for(OrderPaymentDetaDO deta :  paymentDetaList){
+			PojoTxnsLog txnsLog = txnsLogDAO.getTxnsLogByTxnseqno(deta.getRelatetradetxn());
+			try {
+				//风控
+				RiskBean riskBean = new RiskBean();
+				riskBean.setBusiCode(txnsLog.getBusicode());
+				riskBean.setCardNo(txnsLog.getPan());
+				riskBean.setCardType("");
+				riskBean.setCoopInstId(txnsLog.getAccfirmerno());
+				riskBean.setMemberId(txnsLog.getAccmemberid());
+				riskBean.setMerchId(txnsLog.getAccsecmerno());
+				riskBean.setTxnAmt(txnsLog.getAmount()+"");
+				riskBean.setTxnseqno(txnsLog.getTxnseqno());
+				tradeRiskControlService.realTimeTradeRiskControl(riskBean);
+			} catch (TradeRiskException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+				//throw new ConcentrateTradeException("PC012");
+				deta.setStatus(OrderStatusEnum.FAILED.value());
+				deta.setRespcode("0040");
+				deta.setRespmsg("交易有风险,交易被风控系统拒绝！");
+				orderPaymentDetaDAO.updatePaymenyOrderDeta(deta);
+			}
+			//计费
+			//计算交易手续费
+			try {
+				FeeBean feeBean = new FeeBean();
+				feeBean.setBusiCode(txnsLog.getBusicode());
+				feeBean.setFeeVer(txnsLog.getFeever());
+				feeBean.setTxnAmt(txnsLog.getAmount()+"");
+				feeBean.setMerchNo(txnsLog.getAccsecmerno());
+				feeBean.setCardType("1");
+				feeBean.setTxnseqnoOg("");
+				feeBean.setTxnseqno(txnsLog.getTxnseqno());
+				long fee = tradeFeeService.getCommonFee(feeBean);
+				txnsLogDAO.updateTradeFee(txnsLog.getTxnseqno(), fee);
+			} catch (TradeFeeException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+				//throw new ConcentrateTradeException("PC028");
+				txnsLogDAO.updateTradeFee(txnsLog.getTxnseqno(), 0);
+			}
 		}
 		orderPaymentBatchDAO.updateOrderToStartPay(tn);
 		TradeBean tradeBean = new TradeBean();

@@ -84,39 +84,31 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 	
 	
 	@Override
-	public String createRealTimeCollectionOrder(ConcentrateSingleOrderBean orderBean) {
+	public String createRealTimeCollectionOrder(ConcentrateSingleOrderBean orderBean) throws OrderException {
 		String tn = null;
-		try {
-			tn = checkOfSecondPay(orderBean);
-			if(StringUtils.isNotEmpty(tn)){
-				return tn;
-			}
-			checkOfOrder(orderBean);
-			checkOfRepeatSubmit(orderBean);
-			checkOfCollectionBusiness(orderBean);
-			tn = saveCollectionOrder(orderBean);
-		} catch (OrderException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		
+		tn = checkOfSecondPay(orderBean);
+		if(StringUtils.isNotEmpty(tn)){
+			return tn;
 		}
+		checkOfOrder(orderBean);
+		checkOfRepeatSubmit(orderBean);
+		checkOfCollectionBusiness(orderBean);
+		tn = saveCollectionOrder(orderBean);
 		return tn;
 	}
 	@Override
-	public String createRealTimePaymentOrder(ConcentrateSingleOrderBean orderBean) {
+	public String createRealTimePaymentOrder(ConcentrateSingleOrderBean orderBean) throws OrderException {
 		String tn = null;
-		try {
-			tn = checkOfSecondPay(orderBean);
-			if(StringUtils.isNotEmpty(tn)){
-				return null;
-			}
-			checkOfPaymentSecondPay(orderBean);
-			checkOfPaymentRepeatSubmit(orderBean);
-			checkOfPaymentBusiness(orderBean);
-			tn = savePaymentOrder(orderBean);
-		} catch (OrderException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		tn = checkOfSecondPay(orderBean);
+		if(StringUtils.isNotEmpty(tn)){
+			return null;
 		}
+		checkOfPaymentSecondPay(orderBean);
+		checkOfPaymentRepeatSubmit(orderBean);
+		checkOfPaymentBusiness(orderBean);
+		tn = savePaymentOrder(orderBean);
+		
 		return tn;
 	}
 	
@@ -149,6 +141,8 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 		if(orderinfo==null){
 			return null;
 		}
+		
+		//金额，收付款账户,合同号必须一致
 		if(orderinfo.getTxnamt().longValue()!=Long.valueOf(orderBean.getTxnAmt()).longValue()){
 			logger.info("订单金额:{};数据库订单金额:{}", orderBean.getTxnAmt(),orderinfo.getTxnamt());
 			throw new OrderException("OD015");
@@ -158,6 +152,20 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 			logger.info("订单时间:{};数据库订单时间:{}", orderBean.getTxnTime(),orderinfo.getOrdercommitime());
 			throw new OrderException("OD016");
 		}
+		if(!orderinfo.getCreditoraccount().equals(orderBean.getCreditorAccount())){
+			logger.info("收款人账号:{};数据库收款人账号:{}", orderBean.getCreditorAccount(),orderinfo.getCreditoraccount());
+			throw new OrderException("OD050");
+		}
+		if(!orderinfo.getDebtoraccount().equals(orderBean.getDebtorAccount())){
+			logger.info("付款人账号:{};数据库付款人账号:{}", orderBean.getCreditorAccount(),orderinfo.getCreditoraccount());
+			throw new OrderException("OD051");
+		}
+		if(!orderinfo.getDebtorconsign().equals(orderBean.getDebtorConsign())){
+			logger.info("合同编号:{};数据库合同编号:{}", orderBean.getCreditorAccount(),orderinfo.getCreditoraccount());
+			throw new OrderException("OD052");
+		}
+		
+		
 		return orderinfo.getTn();
 	}
 	
@@ -181,13 +189,13 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 		OrderCollectSingleDO orderInfo = orderCollectSingleDAO.getOrderinfoByOrderNoAndMerchNo(orderBean.getOrderId(), orderBean.getMerchNo());
 		if (orderInfo != null) {
 			if ("00".equals(orderInfo.getStatus())) {// 交易成功订单不可二次支付
-				throw new OrderException("OD001","订单交易成功，请不要重复支付");
+				throw new OrderException("OD001");
 			}
 			if ("02".equals(orderInfo.getStatus())) {
-				throw new OrderException("OD002","订单正在支付中，请不要重复支付");
+				throw new OrderException("OD002");
 			}
 			if ("04".equals(orderInfo.getStatus())) {
-				throw new OrderException("OD003","订单失效");
+				throw new OrderException("OD003");
 			}
 			
 		}
@@ -361,14 +369,14 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 	public void checkOfPaymentRepeatSubmit(ConcentrateSingleOrderBean orderBean) throws OrderException{
 		OrderPaymentSingleDO orderInfo = orderPaymentSingleDAO.getOrderinfoByOrderNoAndMerchNo(orderBean.getOrderId(), orderBean.getMerchNo());
 		if (orderInfo != null) {
-			if ("00".equals(orderInfo.getStatus())) {// 交易成功订单不可二次支付
-				throw new OrderException("OD001","订单交易成功，请不要重复支付");
+			if ("00".equals(orderInfo.getStatus())) {// 交易成功订单不可二次提交
+				throw new OrderException("OD053");
 			}
 			if ("02".equals(orderInfo.getStatus())) {
-				throw new OrderException("OD002","订单正在支付中，请不要重复支付");
+				throw new OrderException("OD054");
 			}
 			if ("04".equals(orderInfo.getStatus())) {
-				throw new OrderException("OD003","订单失效");
+				throw new OrderException("OD055");
 			}
 			
 		}
@@ -615,14 +623,14 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 		// TODO Auto-generated method stub
 		OrderCollectBatchDO orderInfo = orderCollectBatchDAO.getCollectBatchOrder(orderBean.getMerId(), orderBean.getBatchNo(), orderBean.getTxnTime().substring(0, 8));
 		if (orderInfo != null) {
-			if ("00".equals(orderInfo.getStatus())) {// 交易成功订单不可二次支付
-				throw new OrderException("OD001","订单交易成功，请不要重复支付");
+			if ("00".equals(orderInfo.getStatus())) {// 交易成功订单不可二次提交
+				throw new OrderException("OD053");
 			}
 			if ("02".equals(orderInfo.getStatus())) {
-				throw new OrderException("OD002","订单正在支付中，请不要重复支付");
+				throw new OrderException("OD054");
 			}
 			if ("04".equals(orderInfo.getStatus())) {
-				throw new OrderException("OD003","订单失效");
+				throw new OrderException("OD055");
 			}
 			
 		}
@@ -661,14 +669,14 @@ public class ConcentrateOrderServiceImpl implements ConcentrateOrderService {
 			ConcentrateBatchOrderBean orderBean) throws OrderException {
 		OrderPaymentBatchDO orderInfo = orderPaymentBatchDAO.getPaymentBatchOrder(orderBean.getMerId(), orderBean.getBatchNo(), orderBean.getTxnTime().substring(0, 8));
 		if (orderInfo != null) {
-			if ("00".equals(orderInfo.getStatus())) {// 交易成功订单不可二次支付
-				throw new OrderException("OD001","订单交易成功，请不要重复支付");
+			if ("00".equals(orderInfo.getStatus())) {// 交易成功订单不可二次提交
+				throw new OrderException("OD053");
 			}
 			if ("02".equals(orderInfo.getStatus())) {
-				throw new OrderException("OD002","订单正在支付中，请不要重复支付");
+				throw new OrderException("OD054");
 			}
 			if ("04".equals(orderInfo.getStatus())) {
-				throw new OrderException("OD003","订单失效");
+				throw new OrderException("OD055");
 			}
 			
 		}
