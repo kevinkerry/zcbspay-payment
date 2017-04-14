@@ -25,6 +25,9 @@ import com.zcbspay.platform.payment.dao.TxnsLogDAO;
 import com.zcbspay.platform.payment.enums.TradeStatFlagEnum;
 import com.zcbspay.platform.payment.exception.ConcentrateTradeException;
 import com.zcbspay.platform.payment.exception.PaymentQuickPayException;
+import com.zcbspay.platform.payment.fee.bean.FeeBean;
+import com.zcbspay.platform.payment.fee.exception.TradeFeeException;
+import com.zcbspay.platform.payment.fee.service.TradeFeeService;
 import com.zcbspay.platform.payment.pojo.OrderCollectSingleDO;
 import com.zcbspay.platform.payment.pojo.OrderPaymentSingleDO;
 import com.zcbspay.platform.payment.pojo.PojoTxnsLog;
@@ -49,6 +52,8 @@ public class RealTimeTradeImpl implements RealTimeTrade {
 	private Producer producer_cmbc_withhold;
 	@Reference(version="1.0")
 	private TradeRiskControlService tradeRiskControlService;
+	@Reference
+	private TradeFeeService tradeFeeService;
 	@Override
 	public ResultBean collectionCharges(String tn) throws ConcentrateTradeException {
 		ResultBean resultBean = null;
@@ -85,6 +90,23 @@ public class RealTimeTradeImpl implements RealTimeTrade {
 			e1.printStackTrace();
 			throw new ConcentrateTradeException("PC012");
 			
+		}
+		//计算交易手续费
+		try {
+			FeeBean feeBean = new FeeBean();
+			feeBean.setBusiCode(txnsLog.getBusicode());
+			feeBean.setFeeVer(txnsLog.getFeever());
+			feeBean.setTxnAmt(txnsLog.getAmount()+"");
+			feeBean.setMerchNo(txnsLog.getAccsecmerno());
+			feeBean.setCardType("1");
+			feeBean.setTxnseqnoOg("");
+			feeBean.setTxnseqno(txnsLog.getTxnseqno());
+			long fee = tradeFeeService.getCommonFee(feeBean);
+			txnsLogDAO.updateTradeFee(txnsLog.getTxnseqno(), fee);
+		} catch (TradeFeeException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			throw new ConcentrateTradeException("PC028");
 		}
 		txnsLogDAO.initretMsg(txnsLog.getTxnseqno());
 		orderCollectSingleDAO.updateOrderToStartPay(tn);
