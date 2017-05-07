@@ -51,7 +51,7 @@ public class HibernateBaseDAOImpl<T> implements BaseDAO<T> {
     public void saveEntity(T t) {
           getSession().save(t);
     }
-    @Override 
+    @Override
     public T update(T t) {
         getSession().update(t);
         return t;

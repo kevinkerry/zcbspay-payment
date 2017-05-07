@@ -35,11 +35,11 @@ public class OrderServiceTest extends BaseTest{
 		//代付订单
 		//test_insteadPay_order();
 		//集中代收
-		//test_collect_order();
+		test_collect_order();
 		//集中代付
 		//test_payment_order();
 		//集中代收-批量
-		test_collect_order_batch();
+		//test_collect_order_batch();
 		//集中代付-批量
 		//test_payment_order_batch();
 		System.out.println("excute time:"+(System.currentTimeMillis()-currentTime));
