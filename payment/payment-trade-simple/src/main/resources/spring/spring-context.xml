@@ -49,7 +49,10 @@
             init-method="init"  
             destroy-method="closeProducer"
             scope="singleton"/> -->
-            
+        <bean id="hzBatchSpringProducer" class="com.zcbspay.platform.hz.batch.application.producer.spring.HZBatchSpringProducer"
+            init-method="init"  
+            destroy-method="closeProducer"
+            scope="singleton"/>     
             
 	<import resource="classpath:/spring-hibernate.xml"/>
 	<import resource="classpath:/spring-dubbo.xml"/>

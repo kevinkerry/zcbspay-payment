@@ -14,9 +14,8 @@ import com.alibaba.rocketmq.client.exception.MQBrokerException;
 import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.alibaba.rocketmq.client.producer.SendResult;
 import com.alibaba.rocketmq.remoting.exception.RemotingException;
-import com.zcbspay.platform.channel.simulation.enums.InsteadPayTagsEnum;
-import com.zcbspay.platform.channel.simulation.enums.WithholdingTagsEnum;
 import com.zcbspay.platform.channel.simulation.interfaces.Producer;
+import com.zcbspay.platform.hz.batch.application.enums.HZBatchEnum;
 import com.zcbspay.platform.payment.bean.ResultBean;
 import com.zcbspay.platform.payment.bean.TradeBean;
 import com.zcbspay.platform.payment.concentrate.BatchTrade;
@@ -58,10 +57,17 @@ public class BatchTradeImpl implements BatchTrade {
 	@Autowired
 	@Qualifier("cmbcWithholdingProducer")
 	private Producer producer_cmbc_withhold;
+	
+	@Autowired
+	@Qualifier("hzBatchSpringProducer")
+	private Producer producer_hz_batch;
 	@Reference(version="1.0")
 	private TradeRiskControlService tradeRiskControlService;
 	@Reference(version="1.0")
 	private TradeFeeService tradeFeeService;
+	
+	
+	
 	
 	@Override
 	public ResultBean collectionCharges(String tn) throws ConcentrateTradeException {
@@ -215,14 +221,21 @@ public class BatchTradeImpl implements BatchTrade {
 		}
 		return resultBean;
 	}
-
+	
 	private void sendTradeMsgToPayment(TradeBean tradeBean) throws MQClientException, RemotingException, InterruptedException, MQBrokerException{
+		SendResult sendResult = producer_hz_batch.sendJsonMessage(JSON.toJSONString(tradeBean),HZBatchEnum.BATCH_PAYMENT);
+	}
+	private void sendTradeMsgToCollection(TradeBean tradeBean) throws MQClientException, RemotingException, InterruptedException, MQBrokerException{
+		SendResult sendResult = producer_hz_batch.sendJsonMessage(JSON.toJSONString(tradeBean),HZBatchEnum.BATCH_COLLECT);
+	}
+
+	/*private void sendTradeMsgToPayment(TradeBean tradeBean) throws MQClientException, RemotingException, InterruptedException, MQBrokerException{
 		SendResult sendResult = producer_cmbc_instead_pay.sendJsonMessage(JSON.toJSONString(tradeBean),InsteadPayTagsEnum.BATCH_PAYMENT_CONCENTRATE);
 	}
 	private void sendTradeMsgToCollection(TradeBean tradeBean) throws MQClientException, RemotingException, InterruptedException, MQBrokerException{
 		SendResult sendResult = producer_cmbc_withhold.sendJsonMessage(JSON.toJSONString(tradeBean),WithholdingTagsEnum.BATCH_COLLECTION_CONCENTRATE);
 		
 		
-	}
+	}*/
 
 }

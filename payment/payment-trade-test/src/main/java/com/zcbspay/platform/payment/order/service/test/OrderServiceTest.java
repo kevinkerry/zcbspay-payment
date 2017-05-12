@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.google.common.collect.Lists;
-import com.zcbspay.platform.member.merchant.service.MerchService;
 import com.zcbspay.platform.payment.exception.PaymentOrderException;
 import com.zcbspay.platform.payment.order.bean.ConcentrateBatchOrderBean;
 import com.zcbspay.platform.payment.order.bean.ConcentrateOrderDetaBean;
@@ -23,25 +22,22 @@ public class OrderServiceTest extends BaseTest{
 
 	@Reference(version="1.0")
 	private OrderService orderService;
-	@Reference(version="1.0")
-	public MerchService merchService;
+	//@Reference(version="1.0")
+	//public MerchService merchService;
 	@Reference(version="1.0")
 	public ConcentrateOrderService concentrateOrderService;
 	@Test
 	public void testAll() throws PaymentOrderException{
 		long currentTime = System.currentTimeMillis();
-		//消费订单
-		//test_consume_order();
-		//代付订单
-		//test_insteadPay_order();
+		
 		//集中代收
-		test_collect_order();
+		//test_collect_order();
 		//集中代付
 		//test_payment_order();
 		//集中代收-批量
-		//test_collect_order_batch();
+		test_collect_order_batch();
 		//集中代付-批量
-		//test_payment_order_batch();
+		test_payment_order_batch();
 		System.out.println("excute time:"+(System.currentTimeMillis()-currentTime));
 	}
 	
@@ -57,23 +53,26 @@ public class OrderServiceTest extends BaseTest{
 			concentrateBatchOrderBean.setBackUrl("");
 			concentrateBatchOrderBean.setBatchNo(DateUtil.getCurrentDate()+System.currentTimeMillis()+"");
 			concentrateBatchOrderBean.setTxnTime(DateUtil.getCurrentDateTime());
-			concentrateBatchOrderBean.setTotalQty("5");
-			concentrateBatchOrderBean.setTotalAmt("50"); 
+			concentrateBatchOrderBean.setTotalQty("1");
+			concentrateBatchOrderBean.setTotalAmt("100"); 
 			concentrateBatchOrderBean.setReserved("");
 			List<ConcentrateOrderDetaBean> detaList = Lists.newArrayList();
-			for(int i=0;i<5;i++){
+			for(int i=0;i<1;i++){
 				ConcentrateOrderDetaBean detaBean = new ConcentrateOrderDetaBean();
 				detaBean.setOrderId(System.currentTimeMillis()+"");
 				detaBean.setCurrencyCode("156");
-				detaBean.setAmt("10");
-				detaBean.setDebtorBank("203121000010");
-				detaBean.setDebtorAccount("6228480018543668979");
-				detaBean.setDebtorName("测试账户1");
-				detaBean.setDebtorConsign("0987654");
-				detaBean.setCreditorBank("203121000010");
-				detaBean.setCreditorAccount("6228480018543668970");
-				detaBean.setCreditorName("测试账户2");
-				detaBean.setProprietary("09001");
+				detaBean.setAmt("100");
+				
+				detaBean.setDebtorBank("308290003126");//收款人开户行
+				detaBean.setDebtorAccount("213582310310001");
+				detaBean.setDebtorName("上海宜赋通信息技术有限公司");
+				
+				detaBean.setCreditorBank("103100004360");//付款人银行号
+				detaBean.setCreditorAccount("6228480018543668976");
+				detaBean.setCreditorName("郭佳");
+				detaBean.setDebtorConsign("098765400001");
+				
+				detaBean.setProprietary("Y0");
 				detaBean.setSummary("test"+i);
 				detaList.add(detaBean);
 			}
@@ -95,27 +94,28 @@ public class OrderServiceTest extends BaseTest{
 			concentrateBatchOrderBean.setTxnType("01");
 			concentrateBatchOrderBean.setTxnSubType("00");
 			concentrateBatchOrderBean.setBizType("000003");
-			concentrateBatchOrderBean.setMerId("200000000000610");
+			concentrateBatchOrderBean.setMerId("200000000001573");
 			concentrateBatchOrderBean.setBackUrl("");
 			concentrateBatchOrderBean.setBatchNo(DateUtil.getCurrentDate()+System.currentTimeMillis()+"");
 			concentrateBatchOrderBean.setTxnTime(DateUtil.getCurrentDateTime());
-			concentrateBatchOrderBean.setTotalQty("5");
-			concentrateBatchOrderBean.setTotalAmt("50"); 
+			concentrateBatchOrderBean.setTotalQty("1");
+			concentrateBatchOrderBean.setTotalAmt("100"); 
 			concentrateBatchOrderBean.setReserved("");
 			List<ConcentrateOrderDetaBean> detaList = Lists.newArrayList();
-			for(int i=0;i<5;i++){
+			for(int i=0;i<1;i++){
 				ConcentrateOrderDetaBean detaBean = new ConcentrateOrderDetaBean();
 				detaBean.setOrderId(System.currentTimeMillis()+"");
 				detaBean.setCurrencyCode("156");
-				detaBean.setAmt("10");
-				detaBean.setDebtorBank("203121000010");
-				detaBean.setDebtorAccount("6228480018543668979");
-				detaBean.setDebtorName("测试账户1");
-				detaBean.setDebtorConsign("0987654");
-				detaBean.setCreditorBank("203121000010");
-				detaBean.setCreditorAccount("6228480018543668970");
-				detaBean.setCreditorName("测试账户2");
-				detaBean.setProprietary("09001");
+				detaBean.setAmt("100");
+				detaBean.setDebtorBank("3310110301");//付款人银行号
+				detaBean.setDebtorAccount("6228480018543668976");
+				detaBean.setDebtorName("郭佳");
+				detaBean.setCreditorBank("3310130601");//收款人开户行
+				detaBean.setCreditorAccount("213582310310001");
+				detaBean.setCreditorName("上海宜赋通信息技术有限公司");
+				detaBean.setDebtorConsign("09876540000000000002");
+				
+				detaBean.setProprietary("50");
 				detaBean.setSummary("test"+i);
 				detaList.add(detaBean);
 			}
